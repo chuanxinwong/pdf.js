@@ -63,14 +63,14 @@ class PDFPresentationMode {
         this.contextMenuOpen = false;
         this.eventBus.dispatch("lastpage", { source: this });
       });
-      contextMenuItems.contextPageRotateCw.addEventListener("click", () => {
-        this.contextMenuOpen = false;
-        this.eventBus.dispatch("rotatecw", { source: this });
-      });
-      contextMenuItems.contextPageRotateCcw.addEventListener("click", () => {
-        this.contextMenuOpen = false;
-        this.eventBus.dispatch("rotateccw", { source: this });
-      });
+      // contextMenuItems.contextPageRotateCw.addEventListener("click", () => {
+      //   this.contextMenuOpen = false;
+      //   this.eventBus.dispatch("rotatecw", { source: this });
+      // });
+      // contextMenuItems.contextPageRotateCcw.addEventListener("click", () => {
+      //   this.contextMenuOpen = false;
+      //   this.eventBus.dispatch("rotateccw", { source: this });
+      // });
     }
   }
 
@@ -182,13 +182,13 @@ class PDFPresentationMode {
   /**
    * @private
    */
-  _notifyStateChange() {
-    this.eventBus.dispatch("presentationmodechanged", {
-      source: this,
-      active: this.active,
-      switchInProgress: !!this.switchInProgress,
-    });
-  }
+  // _notifyStateChange() {
+  //   this.eventBus.dispatch("presentationmodechanged", {
+  //     source: this,
+  //     active: this.active,
+  //     switchInProgress: !!this.switchInProgress,
+  //   });
+  // }
 
   /**
    * Used to initialize a timeout when requesting Presentation Mode,

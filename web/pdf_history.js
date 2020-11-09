@@ -171,7 +171,7 @@ class PDFHistory {
       this._pageHide(); // Simulate a 'pagehide' event when resetting.
 
       this._initialized = false;
-      this._unbindEvents();
+      // this._unbindEvents();
     }
     if (this._updateViewareaTimeout) {
       clearTimeout(this._updateViewareaTimeout);

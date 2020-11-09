@@ -424,10 +424,10 @@ class PDFLinkService {
         break; // No action according to spec
     }
 
-    this.eventBus.dispatch("namedaction", {
-      source: this,
-      action,
-    });
+    // this.eventBus.dispatch("namedaction", {
+    //   source: this,
+    //   action,
+    // });
   }
 
   /**

@@ -16,49 +16,47 @@
 import { AppOptions } from "./app_options.js";
 import { PDFViewerApplication } from "./app.js";
 
-/* eslint-disable-next-line no-unused-vars */
-const pdfjsVersion =
-  typeof PDFJSDev !== "undefined" ? PDFJSDev.eval("BUNDLE_VERSION") : void 0;
-/* eslint-disable-next-line no-unused-vars */
-const pdfjsBuild =
-  typeof PDFJSDev !== "undefined" ? PDFJSDev.eval("BUNDLE_BUILD") : void 0;
+// /* eslint-disable-next-line no-unused-vars */
+// const pdfjsVersion = typeof PDFJSDev !== "undefined" ? PDFJSDev.eval("BUNDLE_VERSION") : void 0;
+// /* eslint-disable-next-line no-unused-vars */
+// const pdfjsBuild = typeof PDFJSDev !== "undefined" ? PDFJSDev.eval("BUNDLE_BUILD") : void 0;
 
 window.PDFViewerApplication = PDFViewerApplication;
 window.PDFViewerApplicationOptions = AppOptions;
 
-if (typeof PDFJSDev !== "undefined" && PDFJSDev.test("CHROME")) {
-  var defaultUrl; // eslint-disable-line no-var
+// if (typeof PDFJSDev !== "undefined" && PDFJSDev.test("CHROME")) {
+//   var defaultUrl; // eslint-disable-line no-var
 
-  (function rewriteUrlClosure() {
-    // Run this code outside DOMContentLoaded to make sure that the URL
-    // is rewritten as soon as possible.
-    const queryString = document.location.search.slice(1);
-    const m = /(^|&)file=([^&]*)/.exec(queryString);
-    defaultUrl = m ? decodeURIComponent(m[2]) : "";
+//   (function rewriteUrlClosure() {
+//     // Run this code outside DOMContentLoaded to make sure that the URL
+//     // is rewritten as soon as possible.
+//     const queryString = document.location.search.slice(1);
+//     const m = /(^|&)file=([^&]*)/.exec(queryString);
+//     defaultUrl = m ? decodeURIComponent(m[2]) : "";
 
-    // Example: chrome-extension://.../http://example.com/file.pdf
-    const humanReadableUrl = "/" + defaultUrl + location.hash;
-    history.replaceState(history.state, "", humanReadableUrl);
-    if (top === window) {
-      // eslint-disable-next-line no-undef
-      chrome.runtime.sendMessage("showPageAction");
-    }
-  })();
-}
+//     // Example: chrome-extension://.../http://example.com/file.pdf
+//     const humanReadableUrl = "/" + defaultUrl + location.hash;
+//     history.replaceState(history.state, "", humanReadableUrl);
+//     if (top === window) {
+//       // eslint-disable-next-line no-undef
+//       chrome.runtime.sendMessage("showPageAction");
+//     }
+//   })();
+// }
 
-if (typeof PDFJSDev !== "undefined" && PDFJSDev.test("MOZCENTRAL")) {
-  require("./firefoxcom.js");
-  require("./firefox_print_service.js");
-}
-if (typeof PDFJSDev !== "undefined" && PDFJSDev.test("GENERIC")) {
-  require("./genericcom.js");
-}
-if (typeof PDFJSDev !== "undefined" && PDFJSDev.test("CHROME")) {
-  require("./chromecom.js");
-}
-if (typeof PDFJSDev !== "undefined" && PDFJSDev.test("CHROME || GENERIC")) {
-  require("./pdf_print_service.js");
-}
+// if (typeof PDFJSDev !== "undefined" && PDFJSDev.test("MOZCENTRAL")) {
+//   require("./firefoxcom.js");
+//   require("./firefox_print_service.js");
+// }
+// if (typeof PDFJSDev !== "undefined" && PDFJSDev.test("GENERIC")) {
+//   require("./genericcom.js");
+// }
+// if (typeof PDFJSDev !== "undefined" && PDFJSDev.test("CHROME")) {
+//   require("./chromecom.js");
+// }
+// if (typeof PDFJSDev !== "undefined" && PDFJSDev.test("CHROME || GENERIC")) {
+//   require("./pdf_print_service.js");
+// }
 
 function getViewerConfiguration() {
   return {
@@ -197,7 +195,7 @@ function webViewerLoad() {
   if (typeof PDFJSDev === "undefined" || !PDFJSDev.test("PRODUCTION")) {
     Promise.all([
       import("pdfjs-web/genericcom.js"),
-      import("pdfjs-web/pdf_print_service.js"),
+      // import("pdfjs-web/pdf_print_service.js"),    // 打印服务
     ]).then(function ([genericCom, pdfPrintService]) {
       PDFViewerApplication.run(config);
     });
@@ -231,10 +229,8 @@ function webViewerLoad() {
   }
 }
 
-if (
-  document.readyState === "interactive" ||
-  document.readyState === "complete"
-) {
+var readyState = document.readyState;
+if (readyState === "interactive" || readyState === "complete") {
   webViewerLoad();
 } else {
   document.addEventListener("DOMContentLoaded", webViewerLoad, true);
