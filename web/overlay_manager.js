@@ -42,7 +42,8 @@ class OverlayManager {
     element,
     callerCloseMethod = null,
     canForceClose = false
-  ) {
+  ) 
+  {
     let container;
     if (!name || !element || !(container = element.parentNode)) {
       throw new Error("Not enough parameters.");

@@ -52,9 +52,6 @@ const defaultOptions = {
     value: false,
     kind: OptionKind.VIEWER + OptionKind.PREFERENCE,
   },
-  /**
-   * The `disablePreferences` is, conditionally, defined below.
-   */
   enablePermissions: {
     /** @type {boolean} */
     value: false,
@@ -100,9 +97,6 @@ const defaultOptions = {
     value: "./images/",
     kind: OptionKind.VIEWER,
   },
-  /**
-   * The `locale` is, conditionally, defined below.
-   */
   maxCanvasPixels: {
     /** @type {number} */
     value: 16777216,
@@ -237,22 +231,16 @@ const defaultOptions = {
         : "../build/pdf.worker.js",
     kind: OptionKind.WORKER,
   },
-};
-if (
-  typeof PDFJSDev === "undefined" ||
-  PDFJSDev.test("!PRODUCTION || (GENERIC && !LIB)")
-) {
-  defaultOptions.disablePreferences = {
-    /** @type {boolean} */
+  disablePreferences: {
     value: false,
     kind: OptionKind.VIEWER,
-  };
-  defaultOptions.locale = {
-    /** @type {string} */
+  },
+  locale: {
     value: typeof navigator !== "undefined" ? navigator.language : "en-US",
     kind: OptionKind.VIEWER,
-  };
-}
+  },
+};
+
 
 const userOptions = Object.create(null);
 
