@@ -35,6 +35,7 @@ const defaultOptions = {
   defaultUrl: {
     /** @type {string} */
     value: "./pdfs/aaaaa.pdf",
+    // value: "./pdfs/bbbb.pdf",
     kind: OptionKind.VIEWER,
   },
   defaultZoomValue: {
