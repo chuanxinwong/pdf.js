@@ -260,78 +260,77 @@ const PDFViewerApplication = {
   },
 
   // 从url中解析一些参数，用于改变配置，
-  async _parseHashParameters() {
-    if (!AppOptions.get("pdfBugEnabled")) {
-      return undefined;
-    }
-    const hash = document.location.hash.substring(1);
-    if (!hash) {
-      return undefined;
-    }
-    const hashParams = parseQueryString(hash),
-      waitOn = [];
+  // async _parseHashParameters() {
+  //   if (!AppOptions.get("pdfBugEnabled")) {
+  //     return undefined;
+  //   }
+  //   const hash = document.location.hash.substring(1);
+  //   if (!hash) {
+  //     return undefined;
+  //   }
+  //   const hashParams = parseQueryString(hash),
+  //     waitOn = [];
 
-    if ("disableworker" in hashParams && hashParams.disableworker === "true") {
-      waitOn.push(loadFakeWorker());
-    }
-    if ("disablerange" in hashParams) {
-      AppOptions.set("disableRange", hashParams.disablerange === "true");
-    }
-    if ("disablestream" in hashParams) {
-      AppOptions.set("disableStream", hashParams.disablestream === "true");
-    }
-    if ("disableautofetch" in hashParams) {
-      AppOptions.set(
-        "disableAutoFetch",
-        hashParams.disableautofetch === "true"
-      );
-    }
-    if ("disablefontface" in hashParams) {
-      AppOptions.set("disableFontFace", hashParams.disablefontface === "true");
-    }
-    if ("disablehistory" in hashParams) {
-      AppOptions.set("disableHistory", hashParams.disablehistory === "true");
-    }
-    if ("webgl" in hashParams) {
-      AppOptions.set("enableWebGL", hashParams.webgl === "true");
-    }
-    if ("verbosity" in hashParams) {
-      AppOptions.set("verbosity", hashParams.verbosity | 0);
-    }
-    if ("textlayer" in hashParams) {
-      switch (hashParams.textlayer) {
-        case "off":
-          AppOptions.set("textLayerMode", TextLayerMode.DISABLE);
-          break;
-        case "visible":
-        case "shadow":
-        case "hover":
-          const viewer = this.appConfig.viewerContainer;
-          viewer.classList.add("textLayer-" + hashParams.textlayer);
-          break;
-      }
-    }
-    if ("pdfbug" in hashParams) {
-      AppOptions.set("pdfBug", true);
-      AppOptions.set("fontExtraProperties", true);
+  //   if ("disableworker" in hashParams && hashParams.disableworker === "true") {
+  //     waitOn.push(loadFakeWorker());
+  //   }
+  //   if ("disablerange" in hashParams) {
+  //     AppOptions.set("disableRange", hashParams.disablerange === "true");
+  //   }
+  //   if ("disablestream" in hashParams) {
+  //     AppOptions.set("disableStream", hashParams.disablestream === "true");
+  //   }
+  //   if ("disableautofetch" in hashParams) {
+  //     AppOptions.set(
+  //       "disableAutoFetch",
+  //       hashParams.disableautofetch === "true"
+  //     );
+  //   }
+  //   if ("disablefontface" in hashParams) {
+  //     AppOptions.set("disableFontFace", hashParams.disablefontface === "true");
+  //   }
+  //   if ("disablehistory" in hashParams) {
+  //     AppOptions.set("disableHistory", hashParams.disablehistory === "true");
+  //   }
+  //   if ("webgl" in hashParams) {
+  //     AppOptions.set("enableWebGL", hashParams.webgl === "true");
+  //   }
+  //   if ("verbosity" in hashParams) {
+  //     AppOptions.set("verbosity", hashParams.verbosity | 0);
+  //   }
+  //   if ("textlayer" in hashParams) {
+  //     switch (hashParams.textlayer) {
+  //       case "off":
+  //         AppOptions.set("textLayerMode", TextLayerMode.DISABLE);
+  //         break;
+  //       case "visible":
+  //       case "shadow":
+  //       case "hover":
+  //         const viewer = this.appConfig.viewerContainer;
+  //         viewer.classList.add("textLayer-" + hashParams.textlayer);
+  //         break;
+  //     }
+  //   }
+  //   if ("pdfbug" in hashParams) {
+  //     AppOptions.set("pdfBug", true);
+  //     AppOptions.set("fontExtraProperties", true);
 
-      const enabled = hashParams.pdfbug.split(",");
-      waitOn.push(loadAndEnablePDFBug(enabled));
-    }
-    // It is not possible to change locale for the (various) extension builds.
-    if (
-      (typeof PDFJSDev === "undefined" ||
-        PDFJSDev.test("!PRODUCTION || GENERIC")) &&
-      "locale" in hashParams
-    ) {
-      AppOptions.set("locale", hashParams.locale);
-    }
+  //     const enabled = hashParams.pdfbug.split(",");
+  //     waitOn.push(loadAndEnablePDFBug(enabled));
+  //   }
+  //   // It is not possible to change locale for the (various) extension builds.
+  //   if (
+  //     (typeof PDFJSDev === "undefined" ||
+  //       PDFJSDev.test("!PRODUCTION || GENERIC")) &&
+  //     "locale" in hashParams
+  //   ) {
+  //     AppOptions.set("locale", hashParams.locale);
+  //   }
 
-    return Promise.all(waitOn).catch(reason => {
-      console.error(`_parseHashParameters: "${reason.message}".`);
-    });
-  },
-
+  //   return Promise.all(waitOn).catch(reason => {
+  //     console.error(`_parseHashParameters: "${reason.message}".`);
+  //   });
+  // },
 
   async _initializeL10n() {
     var par =
@@ -345,7 +344,6 @@ const PDFViewerApplication = {
 
   async _initializeViewerComponents() {
     const appConfig = this.appConfig;
-
 
     const eventBus =
       appConfig.eventBus ||
@@ -365,7 +363,6 @@ const PDFViewerApplication = {
       ignoreDestinationZoom: AppOptions.get("ignoreDestinationZoom"),
     });
     this.pdfLinkService = pdfLinkService;
-
 
     // const downloadManager = this.externalServices.createDownloadManager();
     // this.downloadManager = downloadManager;
@@ -417,7 +414,6 @@ const PDFViewerApplication = {
     //   eventBus,
     // });
     // pdfLinkService.setHistory(this.pdfHistory);
-    
 
     if (!this.supportsIntegratedFind) {
       this.findBar = new PDFFindBar(appConfig.findBar, eventBus, this.l10n);
@@ -443,7 +439,7 @@ const PDFViewerApplication = {
       container,
       eventBus
     );
-    
+
     // 带密码的 pdf 文件
     this.passwordPrompt = new PasswordPrompt(
       appConfig.passwordOverlay,
@@ -458,14 +454,12 @@ const PDFViewerApplication = {
       linkService: pdfLinkService,
     });
 
-
     // 附件
     this.pdfAttachmentViewer = new PDFAttachmentViewer({
       container: appConfig.sidebar.attachmentsView,
       eventBus,
       // downloadManager,
     });
-
 
     // 图层
     this.pdfLayerViewer = new PDFLayerViewer({
@@ -516,30 +510,30 @@ const PDFViewerApplication = {
     this.pdfViewer.currentPageNumber = val;
   },
 
-  get supportsFullscreen() {
-    let support;
-    if (typeof PDFJSDev !== "undefined" && PDFJSDev.test("MOZCENTRAL")) {
-      support =
-        document.fullscreenEnabled === true ||
-        document.mozFullScreenEnabled === true;
-    } else {
-      const doc = document.documentElement;
-      support = !!(
-        doc.requestFullscreen ||
-        doc.mozRequestFullScreen ||
-        doc.webkitRequestFullScreen
-      );
+  // get supportsFullscreen() {
+  //   let support;
+  //   if (typeof PDFJSDev !== "undefined" && PDFJSDev.test("MOZCENTRAL")) {
+  //     support =
+  //       document.fullscreenEnabled === true ||
+  //       document.mozFullScreenEnabled === true;
+  //   } else {
+  //     const doc = document.documentElement;
+  //     support = !!(
+  //       doc.requestFullscreen ||
+  //       doc.mozRequestFullScreen ||
+  //       doc.webkitRequestFullScreen
+  //     );
 
-      if (
-        document.fullscreenEnabled === false ||
-        document.mozFullScreenEnabled === false ||
-        document.webkitFullscreenEnabled === false
-      ) {
-        support = false;
-      }
-    }
-    return shadow(this, "supportsFullscreen", support);
-  },
+  //     if (
+  //       document.fullscreenEnabled === false ||
+  //       document.mozFullScreenEnabled === false ||
+  //       document.webkitFullscreenEnabled === false
+  //     ) {
+  //       support = false;
+  //     }
+  //   }
+  //   return shadow(this, "supportsFullscreen", support);
+  // },
 
   get supportsIntegratedFind() {
     return this.externalServices.supportsIntegratedFind;
@@ -1083,24 +1077,16 @@ const PDFViewerApplication = {
     this.toolbar.setPagesCount(pdfDocument.numPages, false);
     this.secondaryToolbar.setPagesCount(pdfDocument.numPages);
 
-    let baseDocumentUrl;
-    if (typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")) {
-      baseDocumentUrl = null;
-    } else if (PDFJSDev.test("MOZCENTRAL")) {
-      baseDocumentUrl = this.baseUrl;
-    } else if (PDFJSDev.test("CHROME")) {
-      baseDocumentUrl = location.href.split("#")[0];
-    }
-    this.pdfLinkService.setDocument(pdfDocument, baseDocumentUrl);
+    this.pdfLinkService.setDocument(pdfDocument, null);
     // this.pdfDocumentProperties.setDocument(pdfDocument, this.url);
 
-    const annotationStorage = pdfDocument.annotationStorage;
-    annotationStorage.onSetModified = function () {
-      window.addEventListener("beforeunload", beforeUnload);
-    };
-    annotationStorage.onResetModified = function () {
-      window.removeEventListener("beforeunload", beforeUnload);
-    };
+    // const annotationStorage = pdfDocument.annotationStorage;
+    // annotationStorage.onSetModified = function () {
+    //   window.addEventListener("beforeunload", beforeUnload);
+    // };
+    // annotationStorage.onResetModified = function () {
+    //   window.removeEventListener("beforeunload", beforeUnload);
+    // };
 
     const pdfViewer = this.pdfViewer;
     pdfViewer.setDocument(pdfDocument);
@@ -1109,9 +1095,11 @@ const PDFViewerApplication = {
     const pdfThumbnailViewer = this.pdfThumbnailViewer;
     pdfThumbnailViewer.setDocument(pdfDocument);
 
-    const storedPromise = (this.store = new ViewHistory(
-      pdfDocument.fingerprint
-    ))
+    const storedPromise = (
+      this.store = new ViewHistory(
+        pdfDocument.fingerprint
+      )
+    )
       .getMultiple({
         page: null,
         zoom: DEFAULT_SCALE_VALUE,
@@ -1196,7 +1184,7 @@ const PDFViewerApplication = {
 
           // Currently only the "copy"-permission is supported, hence we delay
           // the `getPermissions` API call until *after* rendering has started.
-          this._initializePermissions(pdfDocument);
+          // this._initializePermissions(pdfDocument);
 
           // For documents with different page sizes, once all pages are
           // resolved, ensure that the correct location becomes visible on load.
@@ -1264,67 +1252,67 @@ const PDFViewerApplication = {
       }
     });
 
-    this._initializePageLabels(pdfDocument);
-    this._initializeMetadata(pdfDocument);
-    this._initializeJavaScript(pdfDocument);
+    // this._initializePageLabels(pdfDocument);
+    // this._initializeMetadata(pdfDocument);
+    // this._initializeJavaScript(pdfDocument);
   },
 
   /**
    * @private
    */
-  async _initializeJavaScript(pdfDocument) {
-    const objects = await pdfDocument.getFieldObjects();
+  // async _initializeJavaScript(pdfDocument) {
+  //   const objects = await pdfDocument.getFieldObjects();
 
-    if (pdfDocument !== this.pdfDocument) {
-      return; // The document was closed while the JavaScript data resolved.
-    }
-    if (!objects || !AppOptions.get("enableScripting")) {
-      return;
-    }
-    const scripting = this.externalServices.scripting;
+  //   if (pdfDocument !== this.pdfDocument) {
+  //     return; // The document was closed while the JavaScript data resolved.
+  //   }
+  //   if (!objects || !AppOptions.get("enableScripting")) {
+  //     return;
+  //   }
+  //   const scripting = this.externalServices.scripting;
 
-    window.addEventListener("updateFromSandbox", function (event) {
-      const detail = event.detail;
-      const id = detail.id;
-      if (!id) {
-        switch (detail.command) {
-          case "println":
-            console.log(detail.value);
-            break;
-          case "clear":
-            console.clear();
-            break;
-          case "alert":
-            // eslint-disable-next-line no-alert
-            window.alert(detail.value);
-            break;
-          case "error":
-            console.error(detail.value);
-            break;
-        }
-        return;
-      }
+  //   window.addEventListener("updateFromSandbox", function (event) {
+  //     const detail = event.detail;
+  //     const id = detail.id;
+  //     if (!id) {
+  //       switch (detail.command) {
+  //         case "println":
+  //           console.log(detail.value);
+  //           break;
+  //         case "clear":
+  //           console.clear();
+  //           break;
+  //         case "alert":
+  //           // eslint-disable-next-line no-alert
+  //           window.alert(detail.value);
+  //           break;
+  //         case "error":
+  //           console.error(detail.value);
+  //           break;
+  //       }
+  //       return;
+  //     }
 
-      const element = document.getElementById(id);
-      if (element) {
-        element.dispatchEvent(new CustomEvent("updateFromSandbox", { detail }));
-      } else {
-        const value = detail.value;
-        if (value !== undefined && value !== null) {
-          // the element hasn't been rendered yet so use annotation storage
-          pdfDocument.annotationStorage.setValue(id, detail.value);
-        }
-      }
-    });
+  //     const element = document.getElementById(id);
+  //     if (element) {
+  //       element.dispatchEvent(new CustomEvent("updateFromSandbox", { detail }));
+  //     } else {
+  //       const value = detail.value;
+  //       if (value !== undefined && value !== null) {
+  //         // the element hasn't been rendered yet so use annotation storage
+  //         pdfDocument.annotationStorage.setValue(id, detail.value);
+  //       }
+  //     }
+  //   });
 
-    window.addEventListener("dispatchEventInSandbox", function (event) {
-      scripting.dispatchEventInSandbox(event.detail);
-    });
+  //   window.addEventListener("dispatchEventInSandbox", function (event) {
+  //     scripting.dispatchEventInSandbox(event.detail);
+  //   });
 
-    const dispatchEventName = generateRandomStringForSandbox(objects);
-    const calculationOrder = [];
-    scripting.createSandbox({ objects, dispatchEventName, calculationOrder });
-  },
+  //   const dispatchEventName = generateRandomStringForSandbox(objects);
+  //   const calculationOrder = [];
+  //   scripting.createSandbox({ objects, dispatchEventName, calculationOrder });
+  // },
 
   /**
    * A place to fetch data for telemetry after one page is rendered and the
@@ -1343,154 +1331,152 @@ const PDFViewerApplication = {
     });
   },
 
-  async _initializeMetadata(pdfDocument) {
-    const {
-      info,
-      metadata,
-      contentDispositionFilename,
-    } = await pdfDocument.getMetadata();
+  // async _initializeMetadata(pdfDocument) {
+  //   const {
+  //     info,
+  //     metadata,
+  //     contentDispositionFilename,
+  //   } = await pdfDocument.getMetadata();
 
-    if (pdfDocument !== this.pdfDocument) {
-      return; // The document was closed while the metadata resolved.
-    }
-    this.documentInfo = info;
-    this.metadata = metadata;
-    this.contentDispositionFilename = contentDispositionFilename;
+  //   if (pdfDocument !== this.pdfDocument) {
+  //     return; // The document was closed while the metadata resolved.
+  //   }
+  //   this.documentInfo = info;
+  //   this.metadata = metadata;
+  //   this.contentDispositionFilename = contentDispositionFilename;
 
-    // Provides some basic debug information
-    console.log(
-      `PDF ${pdfDocument.fingerprint} [${info.PDFFormatVersion} ` +
-        `${(info.Producer || "-").trim()} / ${(info.Creator || "-").trim()}] ` +
-        `(PDF.js: ${version || "-"}` +
-        `${this.pdfViewer.enableWebGL ? " [WebGL]" : ""})`
-    );
+  //   // Provides some basic debug information
+  //   console.log(
+  //     `PDF ${pdfDocument.fingerprint} [${info.PDFFormatVersion} ` +
+  //       `${(info.Producer || "-").trim()} / ${(info.Creator || "-").trim()}] ` +
+  //       `(PDF.js: ${version || "-"}` +
+  //       `${this.pdfViewer.enableWebGL ? " [WebGL]" : ""})`
+  //   );
 
-    let pdfTitle;
-    const infoTitle = info && info.Title;
-    if (infoTitle) {
-      pdfTitle = infoTitle;
-    }
-    const metadataTitle = metadata && metadata.get("dc:title");
-    if (metadataTitle) {
-      // Ghostscript can produce invalid 'dc:title' Metadata entries:
-      //  - The title may be "Untitled" (fixes bug 1031612).
-      //  - The title may contain incorrectly encoded characters, which thus
-      //    looks broken, hence we ignore the Metadata entry when it
-      //    contains characters from the Specials Unicode block
-      //    (fixes bug 1605526).
-      if (
-        metadataTitle !== "Untitled" &&
-        !/[\uFFF0-\uFFFF]/g.test(metadataTitle)
-      ) {
-        pdfTitle = metadataTitle;
-      }
-    }
-    if (pdfTitle) {
-      this.setTitle(
-        `${pdfTitle} - ${contentDispositionFilename || document.title}`
-      );
-    } else if (contentDispositionFilename) {
-      this.setTitle(contentDispositionFilename);
-    }
+  //   let pdfTitle;
+  //   const infoTitle = info && info.Title;
+  //   if (infoTitle) {
+  //     pdfTitle = infoTitle;
+  //   }
+  //   const metadataTitle = metadata && metadata.get("dc:title");
+  //   if (metadataTitle) {
+  //     // Ghostscript can produce invalid 'dc:title' Metadata entries:
+  //     //  - The title may be "Untitled" (fixes bug 1031612).
+  //     //  - The title may contain incorrectly encoded characters, which thus
+  //     //    looks broken, hence we ignore the Metadata entry when it
+  //     //    contains characters from the Specials Unicode block
+  //     //    (fixes bug 1605526).
+  //     if (
+  //       metadataTitle !== "Untitled" &&
+  //       !/[\uFFF0-\uFFFF]/g.test(metadataTitle)
+  //     ) {
+  //       pdfTitle = metadataTitle;
+  //     }
+  //   }
+  //   if (pdfTitle) {
+  //     this.setTitle(
+  //       `${pdfTitle} - ${contentDispositionFilename || document.title}`
+  //     );
+  //   } else if (contentDispositionFilename) {
+  //     this.setTitle(contentDispositionFilename);
+  //   }
 
-    if (info.IsXFAPresent && !info.IsAcroFormPresent) {
-      console.warn("Warning: XFA is not supported");
-      this._delayedFallback(UNSUPPORTED_FEATURES.forms);
-    } else if (
-      (info.IsAcroFormPresent || info.IsXFAPresent) &&
-      !this.pdfViewer.renderInteractiveForms
-    ) {
-      console.warn("Warning: Interactive form support is not enabled");
-      this._delayedFallback(UNSUPPORTED_FEATURES.forms);
-    }
+  //   if (info.IsXFAPresent && !info.IsAcroFormPresent) {
+  //     console.warn("Warning: XFA is not supported");
+  //     this._delayedFallback(UNSUPPORTED_FEATURES.forms);
+  //   } else if (
+  //     (info.IsAcroFormPresent || info.IsXFAPresent) &&
+  //     !this.pdfViewer.renderInteractiveForms
+  //   ) {
+  //     console.warn("Warning: Interactive form support is not enabled");
+  //     this._delayedFallback(UNSUPPORTED_FEATURES.forms);
+  //   }
 
-    // Telemetry labels must be C++ variable friendly.
-    let versionId = "other";
-    if (KNOWN_VERSIONS.includes(info.PDFFormatVersion)) {
-      versionId = `v${info.PDFFormatVersion.replace(".", "_")}`;
-    }
-    let generatorId = "other";
-    if (info.Producer) {
-      const producer = info.Producer.toLowerCase();
-      KNOWN_GENERATORS.some(function (generator) {
-        if (!producer.includes(generator)) {
-          return false;
-        }
-        generatorId = generator.replace(/[ .-]/g, "_");
-        return true;
-      });
-    }
-    let formType = null;
-    if (info.IsXFAPresent) {
-      formType = "xfa";
-    } else if (info.IsAcroFormPresent) {
-      formType = "acroform";
-    }
-    this.externalServices.reportTelemetry({
-      type: "documentInfo",
-      version: versionId,
-      generator: generatorId,
-      formType,
-    });
-  },
+  //   // Telemetry labels must be C++ variable friendly.
+  //   let versionId = "other";
+  //   if (KNOWN_VERSIONS.includes(info.PDFFormatVersion)) {
+  //     versionId = `v${info.PDFFormatVersion.replace(".", "_")}`;
+  //   }
+  //   let generatorId = "other";
+  //   if (info.Producer) {
+  //     const producer = info.Producer.toLowerCase();
+  //     KNOWN_GENERATORS.some(function (generator) {
+  //       if (!producer.includes(generator)) {
+  //         return false;
+  //       }
+  //       generatorId = generator.replace(/[ .-]/g, "_");
+  //       return true;
+  //     });
+  //   }
+  //   let formType = null;
+  //   if (info.IsXFAPresent) {
+  //     formType = "xfa";
+  //   } else if (info.IsAcroFormPresent) {
+  //     formType = "acroform";
+  //   }
+  //   this.externalServices.reportTelemetry({
+  //     type: "documentInfo",
+  //     version: versionId,
+  //     generator: generatorId,
+  //     formType,
+  //   });
+  // },
 
-  async _initializePageLabels(pdfDocument) {
-    const labels = await pdfDocument.getPageLabels();
+  // async _initializePageLabels(pdfDocument) {
+  //   const labels = await pdfDocument.getPageLabels();
 
-    if (pdfDocument !== this.pdfDocument) {
-      return; // The document was closed while the page labels resolved.
-    }
-    if (!labels || AppOptions.get("disablePageLabels")) {
-      return;
-    }
-    const numLabels = labels.length;
-    if (numLabels !== this.pagesCount) {
-      console.error(
-        "The number of Page Labels does not match the number of pages in the document."
-      );
-      return;
-    }
-    let i = 0;
-    // Ignore page labels that correspond to standard page numbering.
-    while (i < numLabels && labels[i] === (i + 1).toString()) {
-      i++;
-    }
-    if (i === numLabels) {
-      return;
-    }
-    const { pdfViewer, pdfThumbnailViewer, toolbar } = this;
+  //   if (pdfDocument !== this.pdfDocument) {
+  //     return; // The document was closed while the page labels resolved.
+  //   }
+  //   if (!labels || AppOptions.get("disablePageLabels")) {
+  //     return;
+  //   }
+  //   const numLabels = labels.length;
+  //   if (numLabels !== this.pagesCount) {
+  //     console.error(
+  //       "The number of Page Labels does not match the number of pages in the document."
+  //     );
+  //     return;
+  //   }
+  //   let i = 0;
+  //   // Ignore page labels that correspond to standard page numbering.
+  //   while (i < numLabels && labels[i] === (i + 1).toString()) {
+  //     i++;
+  //   }
+  //   if (i === numLabels) {
+  //     return;
+  //   }
+  //   const { pdfViewer, pdfThumbnailViewer, toolbar } = this;
 
-    pdfViewer.setPageLabels(labels);
-    pdfThumbnailViewer.setPageLabels(labels);
+  //   pdfViewer.setPageLabels(labels);
+  //   pdfThumbnailViewer.setPageLabels(labels);
 
-    // Changing toolbar page display to use labels and we need to set
-    // the label of the current page.
-    toolbar.setPagesCount(numLabels, true);
-    toolbar.setPageNumber(
-      pdfViewer.currentPageNumber,
-      pdfViewer.currentPageLabel
-    );
-  },
+  //   // Changing toolbar page display to use labels and we need to set
+  //   // the label of the current page.
+  //   toolbar.setPagesCount(numLabels, true);
+  //   toolbar.setPageNumber(
+  //     pdfViewer.currentPageNumber,
+  //     pdfViewer.currentPageLabel
+  //   );
+  // },
 
-  async _initializePermissions(pdfDocument) {
-    const permissions = await pdfDocument.getPermissions();
+  // async _initializePermissions(pdfDocument) {
+  //   const permissions = await pdfDocument.getPermissions();
 
-    if (pdfDocument !== this.pdfDocument) {
-      return; // The document was closed while the permissions resolved.
-    }
-    if (!permissions || !AppOptions.get("enablePermissions")) {
-      return;
-    }
-    // Currently only the "copy"-permission is supported.
-    if (!permissions.includes(PermissionFlag.COPY)) {
-      this.appConfig.viewerContainer.classList.add(ENABLE_PERMISSIONS_CLASS);
-    }
-  },
+  //   if (pdfDocument !== this.pdfDocument) {
+  //     return; // The document was closed while the permissions resolved.
+  //   }
+  //   if (!permissions || !AppOptions.get("enablePermissions")) {
+  //     return;
+  //   }
+  //   // Currently only the "copy"-permission is supported.
+  //   if (!permissions.includes(PermissionFlag.COPY)) {
+  //     this.appConfig.viewerContainer.classList.add(ENABLE_PERMISSIONS_CLASS);
+  //   }
+  // },
 
-  setInitialView(
-    storedHash,
-    { rotation, sidebarView, scrollMode, spreadMode } = {}
-  ) {
+  // 设置初始化页面的位置 历史记录
+  setInitialView( storedHash, { rotation, sidebarView, scrollMode, spreadMode } = {} ) {
     const setRotation = angle => {
       if (isValidRotation(angle)) {
         this.pdfViewer.pagesRotation = angle;
@@ -1555,15 +1541,15 @@ const PDFViewerApplication = {
     this.pdfRenderingQueue.renderHighestPriority();
   },
 
-  rotatePages(delta) {
-    if (!this.pdfDocument) {
-      return;
-    }
-    const newRotation = (this.pdfViewer.pagesRotation + 360 + delta) % 360;
-    this.pdfViewer.pagesRotation = newRotation;
-    // Note that the thumbnail viewer is updated, and rendering is triggered,
-    // in the 'rotationchanging' event handler.
-  },
+  // rotatePages(delta) {
+  //   if (!this.pdfDocument) {
+  //     return;
+  //   }
+  //   const newRotation = (this.pdfViewer.pagesRotation + 360 + delta) % 360;
+  //   this.pdfViewer.pagesRotation = newRotation;
+  //   // Note that the thumbnail viewer is updated, and rendering is triggered,
+  //   // in the 'rotationchanging' event handler.
+  // },
 
   requestPresentationMode() {
     if (!this.pdfPresentationMode) {
@@ -1663,41 +1649,41 @@ const PDFViewerApplication = {
     // window.addEventListener("afterprint", _boundEvents.windowAfterPrint);
   },
 
-  accumulateWheelTicks(ticks) {
-    // If the scroll direction changed, reset the accumulated wheel ticks.
-    if (
-      (this._wheelUnusedTicks > 0 && ticks < 0) ||
-      (this._wheelUnusedTicks < 0 && ticks > 0)
-    ) {
-      this._wheelUnusedTicks = 0;
-    }
-    this._wheelUnusedTicks += ticks;
-    const wholeTicks =
-      Math.sign(this._wheelUnusedTicks) *
-      Math.floor(Math.abs(this._wheelUnusedTicks));
-    this._wheelUnusedTicks -= wholeTicks;
-    return wholeTicks;
-  },
+  // accumulateWheelTicks(ticks) {
+  //   // If the scroll direction changed, reset the accumulated wheel ticks.
+  //   if (
+  //     (this._wheelUnusedTicks > 0 && ticks < 0) ||
+  //     (this._wheelUnusedTicks < 0 && ticks > 0)
+  //   ) {
+  //     this._wheelUnusedTicks = 0;
+  //   }
+  //   this._wheelUnusedTicks += ticks;
+  //   const wholeTicks =
+  //     Math.sign(this._wheelUnusedTicks) *
+  //     Math.floor(Math.abs(this._wheelUnusedTicks));
+  //   this._wheelUnusedTicks -= wholeTicks;
+  //   return wholeTicks;
+  // },
 };
 
-async function loadFakeWorker() {
-  if (!GlobalWorkerOptions.workerSrc) {
-    GlobalWorkerOptions.workerSrc = AppOptions.get("workerSrc");
-  }
-  if (typeof PDFJSDev === "undefined" || !PDFJSDev.test("PRODUCTION")) {
-    window.pdfjsWorker = await import("pdfjs/core/worker.js");
-    return undefined;
-  }
-  return loadScript(PDFWorker.getWorkerSrc());
-}
+// async function loadFakeWorker() {
+//   if (!GlobalWorkerOptions.workerSrc) {
+//     GlobalWorkerOptions.workerSrc = AppOptions.get("workerSrc");
+//   }
+//   if (typeof PDFJSDev === "undefined" || !PDFJSDev.test("PRODUCTION")) {
+//     window.pdfjsWorker = await import("pdfjs/core/worker.js");
+//     return undefined;
+//   }
+//   return loadScript(PDFWorker.getWorkerSrc());
+// }
 
-function loadAndEnablePDFBug(enabledTabs) {
-  const appConfig = PDFViewerApplication.appConfig;
-  return loadScript(appConfig.debuggerScriptPath).then(function () {
-    PDFBug.enable(enabledTabs);
-    PDFBug.init({ OPS }, appConfig.mainContainer);
-  });
-}
+// function loadAndEnablePDFBug(enabledTabs) {
+//   const appConfig = PDFViewerApplication.appConfig;
+//   return loadScript(appConfig.debuggerScriptPath).then(function () {
+//     PDFBug.enable(enabledTabs);
+//     PDFBug.init({ OPS }, appConfig.mainContainer);
+//   });
+// }
 
 function webViewerInitialized() {
   const appConfig = PDFViewerApplication.appConfig;
@@ -1785,10 +1771,10 @@ function webViewerInitialized() {
     appConfig.secondaryToolbar.printButton.classList.add("hidden");
   }
 
-  if (!PDFViewerApplication.supportsFullscreen) {
-    appConfig.toolbar.presentationModeButton.classList.add("hidden");
-    appConfig.secondaryToolbar.presentationModeButton.classList.add("hidden");
-  }
+  // if (!PDFViewerApplication.supportsFullscreen) {
+  //   appConfig.toolbar.presentationModeButton.classList.add("hidden");
+  //   appConfig.secondaryToolbar.presentationModeButton.classList.add("hidden");
+  // }
 
   if (PDFViewerApplication.supportsIntegratedFind) {
     appConfig.toolbar.viewFind.classList.add("hidden");
@@ -1806,6 +1792,7 @@ function webViewerInitialized() {
   }
 }
 
+// 重置
 function webViewerResetPermissions() {
   const { appConfig } = PDFViewerApplication;
   if (!appConfig) {
@@ -2103,6 +2090,7 @@ function webViewerPageChanging({ pageNumber, pageLabel }) {
 }
 
 function beforeUnload(evt) {
+  debugger;
   evt.preventDefault();
   evt.returnValue = "";
   return false;
