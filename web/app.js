@@ -174,7 +174,7 @@ const PDFViewerApplication = {
 
     // await this._readPreferences();   // 专业模式，
     // await this._parseHashParameters();
-    await this._initializeL10n();
+    // await this._initializeL10n();
 
     await this._initializeViewerComponents();
 
@@ -185,11 +185,11 @@ const PDFViewerApplication = {
 
     // We can start UI localization now.
     const appContainer = appConfig.appContainer || document.documentElement;
-    this.l10n.translate(appContainer).then(() => {
-      // Dispatch the 'localized' event on the `eventBus` once the viewer
-      // has been fully initialized and translated.
-      // this.eventBus.dispatch("localized", { source: this });
-    });
+    // this.l10n.translate(appContainer).then(() => {
+    //   // Dispatch the 'localized' event on the `eventBus` once the viewer
+    //   // has been fully initialized and translated.
+    //   // this.eventBus.dispatch("localized", { source: this });
+    // });
 
     this._initializedCapability.resolve();
   },
@@ -206,7 +206,7 @@ const PDFViewerApplication = {
     }
     try {
       const prefs = await this.preferences.getAll();
-      
+
       console.log(prefs)
       debugger
       
@@ -269,7 +269,7 @@ const PDFViewerApplication = {
       // findController,
       renderer: AppOptions.get("renderer"),
       enableWebGL: AppOptions.get("enableWebGL"),
-      l10n: this.l10n,
+      // l10n: this.l10n,
       textLayerMode: AppOptions.get("textLayerMode"),
       imageResourcesPath: AppOptions.get("imageResourcesPath"),
       renderInteractiveForms: AppOptions.get("renderInteractiveForms"),
@@ -286,7 +286,7 @@ const PDFViewerApplication = {
       eventBus,
       renderingQueue: pdfRenderingQueue,
       linkService: pdfLinkService,
-      l10n: this.l10n,
+      // l10n: this.l10n,
     });
     pdfRenderingQueue.setThumbnailViewer(this.pdfThumbnailViewer);
 
@@ -296,11 +296,11 @@ const PDFViewerApplication = {
     // });
     // pdfLinkService.setHistory(this.pdfHistory);
 
-    if (!this.supportsIntegratedFind) {
-      this.findBar = new PDFFindBar(appConfig.findBar, eventBus, this.l10n);
-    }
+    // if (!this.supportsIntegratedFind) {
+    //   this.findBar = new PDFFindBar(appConfig.findBar, eventBus, this.l10n);
+    // }
 
-    this.toolbar = new Toolbar(appConfig.toolbar, eventBus, this.l10n);
+    this.toolbar = new Toolbar(appConfig.toolbar, eventBus);
 
     this.secondaryToolbar = new SecondaryToolbar(
       appConfig.secondaryToolbar,
@@ -312,7 +312,7 @@ const PDFViewerApplication = {
     this.passwordPrompt = new PasswordPrompt(
       appConfig.passwordOverlay,
       this.overlayManager,
-      this.l10n
+      // this.l10n
     );
 
     // 大纲视图
@@ -333,7 +333,7 @@ const PDFViewerApplication = {
     this.pdfLayerViewer = new PDFLayerViewer({
       container: appConfig.sidebar.layersView,
       eventBus,
-      l10n: this.l10n,
+      // l10n: this.l10n,
     });
 
     // 侧边栏
@@ -342,7 +342,7 @@ const PDFViewerApplication = {
       pdfViewer: this.pdfViewer,
       pdfThumbnailViewer: this.pdfThumbnailViewer,
       eventBus,
-      l10n: this.l10n,
+      // l10n: this.l10n,
     });
     this.pdfSidebar.onToggled = this.forceRendering.bind(this);
 
@@ -350,7 +350,7 @@ const PDFViewerApplication = {
     this.pdfSidebarResizer = new PDFSidebarResizer(
       appConfig.sidebarResizer,
       eventBus,
-      this.l10n
+      // this.l10n
     );
   },
 
@@ -903,18 +903,18 @@ function webViewerInitialized() {
     appConfig.secondaryToolbar.openFileButton.setAttribute("hidden", "true");
   }
 
-  if (!PDFViewerApplication.supportsDocumentFonts) {
-    AppOptions.set("disableFontFace", true);
-    PDFViewerApplication.l10n
-      .get(
-        "web_fonts_disabled",
-        null,
-        "Web fonts are disabled: unable to use embedded PDF fonts."
-      )
-      .then(msg => {
-        console.warn(msg);
-      });
-  }
+  // if (!PDFViewerApplication.supportsDocumentFonts) {
+  //   AppOptions.set("disableFontFace", true);
+  //   PDFViewerApplication.l10n
+  //     .get(
+  //       "web_fonts_disabled",
+  //       null,
+  //       "Web fonts are disabled: unable to use embedded PDF fonts."
+  //     )
+  //     .then(msg => {
+  //       console.warn(msg);
+  //     });
+  // }
 
   if (!PDFViewerApplication.supportsPrinting) {
     appConfig.toolbar.print.classList.add("hidden");
@@ -929,12 +929,12 @@ function webViewerInitialized() {
     // webViewerOpenFileViaURL(file);
     PDFViewerApplication.open(file);
   } catch (reason) {
-    PDFViewerApplication.l10n
-      .get("loading_error", null, "An error occurred while loading the PDF.")
-      .then(msg => {
-        // PDFViewerApplication.error(msg, reason);
-        console.error(msg);
-      });
+    // PDFViewerApplication.l10n
+    //   .get("loading_error", null, "An error occurred while loading the PDF.")
+    //   .then(msg => {
+    //     // PDFViewerApplication.error(msg, reason);
+    //     console.error(msg);
+    //   });
   }
 }
 
@@ -959,17 +959,17 @@ function webViewerPageRendered({ pageNumber, timestamp, error }) {
     }
   }
 
-  if (error) {
-    PDFViewerApplication.l10n
-      .get(
-        "rendering_error",
-        null,
-        "An error occurred while rendering the page."
-      )
-      .then(msg => {
-        console.error(msg, error);
-      });
-  }
+  // if (error) {
+  //   PDFViewerApplication.l10n
+  //     .get(
+  //       "rendering_error",
+  //       null,
+  //       "An error occurred while rendering the page."
+  //     )
+  //     .then(msg => {
+  //       console.error(msg, error);
+  //     });
+  // }
 
   PDFViewerApplication.externalServices.reportTelemetry({
     type: "pageInfo",
