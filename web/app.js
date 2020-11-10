@@ -259,78 +259,6 @@ const PDFViewerApplication = {
     }
   },
 
-  // 从url中解析一些参数，用于改变配置，
-  // async _parseHashParameters() {
-  //   if (!AppOptions.get("pdfBugEnabled")) {
-  //     return undefined;
-  //   }
-  //   const hash = document.location.hash.substring(1);
-  //   if (!hash) {
-  //     return undefined;
-  //   }
-  //   const hashParams = parseQueryString(hash),
-  //     waitOn = [];
-
-  //   if ("disableworker" in hashParams && hashParams.disableworker === "true") {
-  //     waitOn.push(loadFakeWorker());
-  //   }
-  //   if ("disablerange" in hashParams) {
-  //     AppOptions.set("disableRange", hashParams.disablerange === "true");
-  //   }
-  //   if ("disablestream" in hashParams) {
-  //     AppOptions.set("disableStream", hashParams.disablestream === "true");
-  //   }
-  //   if ("disableautofetch" in hashParams) {
-  //     AppOptions.set(
-  //       "disableAutoFetch",
-  //       hashParams.disableautofetch === "true"
-  //     );
-  //   }
-  //   if ("disablefontface" in hashParams) {
-  //     AppOptions.set("disableFontFace", hashParams.disablefontface === "true");
-  //   }
-  //   if ("disablehistory" in hashParams) {
-  //     AppOptions.set("disableHistory", hashParams.disablehistory === "true");
-  //   }
-  //   if ("webgl" in hashParams) {
-  //     AppOptions.set("enableWebGL", hashParams.webgl === "true");
-  //   }
-  //   if ("verbosity" in hashParams) {
-  //     AppOptions.set("verbosity", hashParams.verbosity | 0);
-  //   }
-  //   if ("textlayer" in hashParams) {
-  //     switch (hashParams.textlayer) {
-  //       case "off":
-  //         AppOptions.set("textLayerMode", TextLayerMode.DISABLE);
-  //         break;
-  //       case "visible":
-  //       case "shadow":
-  //       case "hover":
-  //         const viewer = this.appConfig.viewerContainer;
-  //         viewer.classList.add("textLayer-" + hashParams.textlayer);
-  //         break;
-  //     }
-  //   }
-  //   if ("pdfbug" in hashParams) {
-  //     AppOptions.set("pdfBug", true);
-  //     AppOptions.set("fontExtraProperties", true);
-
-  //     const enabled = hashParams.pdfbug.split(",");
-  //     waitOn.push(loadAndEnablePDFBug(enabled));
-  //   }
-  //   // It is not possible to change locale for the (various) extension builds.
-  //   if (
-  //     (typeof PDFJSDev === "undefined" ||
-  //       PDFJSDev.test("!PRODUCTION || GENERIC")) &&
-  //     "locale" in hashParams
-  //   ) {
-  //     AppOptions.set("locale", hashParams.locale);
-  //   }
-
-  //   return Promise.all(waitOn).catch(reason => {
-  //     console.error(`_parseHashParameters: "${reason.message}".`);
-  //   });
-  // },
 
   async _initializeL10n() {
     var par =
@@ -363,9 +291,6 @@ const PDFViewerApplication = {
       ignoreDestinationZoom: AppOptions.get("ignoreDestinationZoom"),
     });
     this.pdfLinkService = pdfLinkService;
-
-    // const downloadManager = this.externalServices.createDownloadManager();
-    // this.downloadManager = downloadManager;
 
     // 查看 搜索
     // const findController = new PDFFindController({
@@ -419,18 +344,6 @@ const PDFViewerApplication = {
       this.findBar = new PDFFindBar(appConfig.findBar, eventBus, this.l10n);
     }
 
-    // this.pdfDocumentProperties = new PDFDocumentProperties(
-    //   appConfig.documentProperties,
-    //   this.overlayManager,
-    //   eventBus,
-    //   this.l10n
-    // );
-
-    // this.pdfCursorTools = new PDFCursorTools({
-    //   container,
-    //   eventBus,
-    //   cursorToolOnLoad: AppOptions.get("cursorToolOnLoad"),
-    // });
 
     this.toolbar = new Toolbar(appConfig.toolbar, eventBus, this.l10n);
 
@@ -510,30 +423,6 @@ const PDFViewerApplication = {
     this.pdfViewer.currentPageNumber = val;
   },
 
-  // get supportsFullscreen() {
-  //   let support;
-  //   if (typeof PDFJSDev !== "undefined" && PDFJSDev.test("MOZCENTRAL")) {
-  //     support =
-  //       document.fullscreenEnabled === true ||
-  //       document.mozFullScreenEnabled === true;
-  //   } else {
-  //     const doc = document.documentElement;
-  //     support = !!(
-  //       doc.requestFullscreen ||
-  //       doc.mozRequestFullScreen ||
-  //       doc.webkitRequestFullScreen
-  //     );
-
-  //     if (
-  //       document.fullscreenEnabled === false ||
-  //       document.mozFullScreenEnabled === false ||
-  //       document.webkitFullscreenEnabled === false
-  //     ) {
-  //       support = false;
-  //     }
-  //   }
-  //   return shadow(this, "supportsFullscreen", support);
-  // },
 
   get supportsIntegratedFind() {
     return this.externalServices.supportsIntegratedFind;
@@ -797,77 +686,6 @@ const PDFViewerApplication = {
     );
   },
 
-  // download({ sourceEventType = "download" } = {}) {
-  //   function downloadByUrl() {
-  //     downloadManager.downloadUrl(url, filename);
-  //   }
-
-  //   const url = this.baseUrl;
-  //   // Use this.url instead of this.baseUrl to perform filename detection based
-  //   // on the reference fragment as ultimate fallback if needed.
-  //   const filename =
-  //     this.contentDispositionFilename || getPDFFileNameFromURL(this.url);
-  //   const downloadManager = this.downloadManager;
-  //   downloadManager.onerror = err => {
-  //     // This error won't really be helpful because it's likely the
-  //     // fallback won't work either (or is already open).
-  //     this.error(`PDF failed to download: ${err}`);
-  //   };
-
-  //   // When the PDF document isn't ready, or the PDF file is still downloading,
-  //   // simply download using the URL.
-  //   if (!this.pdfDocument || !this.downloadComplete) {
-  //     downloadByUrl();
-  //     return;
-  //   }
-
-  //   this.pdfDocument
-  //     .getData()
-  //     .then(function (data) {
-  //       const blob = new Blob([data], { type: "application/pdf" });
-  //       downloadManager.download(blob, url, filename, sourceEventType);
-  //     })
-  //     .catch(downloadByUrl); // Error occurred, try downloading with the URL.
-  // },
-
-  // save({ sourceEventType = "download" } = {}) {
-  //   if (this._saveInProgress) {
-  //     return;
-  //   }
-
-  //   const url = this.baseUrl;
-  //   // Use this.url instead of this.baseUrl to perform filename detection based
-  //   // on the reference fragment as ultimate fallback if needed.
-  //   const filename =
-  //     this.contentDispositionFilename || getPDFFileNameFromURL(this.url);
-  //   const downloadManager = this.downloadManager;
-  //   downloadManager.onerror = err => {
-  //     // This error won't really be helpful because it's likely the
-  //     // fallback won't work either (or is already open).
-  //     this.error(`PDF failed to be saved: ${err}`);
-  //   };
-
-  //   // When the PDF document isn't ready, or the PDF file is still downloading,
-  //   // simply download using the URL.
-  //   if (!this.pdfDocument || !this.downloadComplete) {
-  //     this.download({ sourceEventType });
-  //     return;
-  //   }
-
-  //   this._saveInProgress = true;
-  //   this.pdfDocument
-  //     .saveDocument(this.pdfDocument.annotationStorage)
-  //     .then(data => {
-  //       const blob = new Blob([data], { type: "application/pdf" });
-  //       downloadManager.download(blob, url, filename, sourceEventType);
-  //     })
-  //     .catch(() => {
-  //       this.download({ sourceEventType });
-  //     })
-  //     .finally(() => {
-  //       this._saveInProgress = false;
-  //     });
-  // },
 
   /**
    * For PDF documents that contain e.g. forms and javaScript, we should only
@@ -1078,15 +896,6 @@ const PDFViewerApplication = {
     this.secondaryToolbar.setPagesCount(pdfDocument.numPages);
 
     this.pdfLinkService.setDocument(pdfDocument, null);
-    // this.pdfDocumentProperties.setDocument(pdfDocument, this.url);
-
-    // const annotationStorage = pdfDocument.annotationStorage;
-    // annotationStorage.onSetModified = function () {
-    //   window.addEventListener("beforeunload", beforeUnload);
-    // };
-    // annotationStorage.onResetModified = function () {
-    //   window.removeEventListener("beforeunload", beforeUnload);
-    // };
 
     const pdfViewer = this.pdfViewer;
     pdfViewer.setDocument(pdfDocument);
@@ -1128,11 +937,6 @@ const PDFViewerApplication = {
         .then(async ([timeStamp, stored, pageLayout, pageMode, openAction]) => {
           const viewOnLoad = AppOptions.get("viewOnLoad");
 
-          // this._initializePdfHistory({
-          //   fingerprint: pdfDocument.fingerprint,
-          //   viewOnLoad,
-          //   initialDest: openAction && openAction.dest,
-          // });
           const initialBookmark = this.initialBookmark;
 
           // Initialize the default values, from user preferences.
@@ -1182,10 +986,6 @@ const PDFViewerApplication = {
             pdfViewer.focus();
           }
 
-          // Currently only the "copy"-permission is supported, hence we delay
-          // the `getPermissions` API call until *after* rendering has started.
-          // this._initializePermissions(pdfDocument);
-
           // For documents with different page sizes, once all pages are
           // resolved, ensure that the correct location becomes visible on load.
           // (To reduce the risk, in very large and/or slow loading documents,
@@ -1224,9 +1024,6 @@ const PDFViewerApplication = {
         });
     });
 
-    // pagesPromise.then(() => {
-    //   this._initializeAutoPrint(pdfDocument, openActionPromise);
-    // });
 
     onePageRendered.then(() => {
       pdfDocument.getOutline().then(outline => {
@@ -1252,67 +1049,8 @@ const PDFViewerApplication = {
       }
     });
 
-    // this._initializePageLabels(pdfDocument);
-    // this._initializeMetadata(pdfDocument);
-    // this._initializeJavaScript(pdfDocument);
   },
 
-  /**
-   * @private
-   */
-  // async _initializeJavaScript(pdfDocument) {
-  //   const objects = await pdfDocument.getFieldObjects();
-
-  //   if (pdfDocument !== this.pdfDocument) {
-  //     return; // The document was closed while the JavaScript data resolved.
-  //   }
-  //   if (!objects || !AppOptions.get("enableScripting")) {
-  //     return;
-  //   }
-  //   const scripting = this.externalServices.scripting;
-
-  //   window.addEventListener("updateFromSandbox", function (event) {
-  //     const detail = event.detail;
-  //     const id = detail.id;
-  //     if (!id) {
-  //       switch (detail.command) {
-  //         case "println":
-  //           console.log(detail.value);
-  //           break;
-  //         case "clear":
-  //           console.clear();
-  //           break;
-  //         case "alert":
-  //           // eslint-disable-next-line no-alert
-  //           window.alert(detail.value);
-  //           break;
-  //         case "error":
-  //           console.error(detail.value);
-  //           break;
-  //       }
-  //       return;
-  //     }
-
-  //     const element = document.getElementById(id);
-  //     if (element) {
-  //       element.dispatchEvent(new CustomEvent("updateFromSandbox", { detail }));
-  //     } else {
-  //       const value = detail.value;
-  //       if (value !== undefined && value !== null) {
-  //         // the element hasn't been rendered yet so use annotation storage
-  //         pdfDocument.annotationStorage.setValue(id, detail.value);
-  //       }
-  //     }
-  //   });
-
-  //   window.addEventListener("dispatchEventInSandbox", function (event) {
-  //     scripting.dispatchEventInSandbox(event.detail);
-  //   });
-
-  //   const dispatchEventName = generateRandomStringForSandbox(objects);
-  //   const calculationOrder = [];
-  //   scripting.createSandbox({ objects, dispatchEventName, calculationOrder });
-  // },
 
   /**
    * A place to fetch data for telemetry after one page is rendered and the
@@ -1331,149 +1069,6 @@ const PDFViewerApplication = {
     });
   },
 
-  // async _initializeMetadata(pdfDocument) {
-  //   const {
-  //     info,
-  //     metadata,
-  //     contentDispositionFilename,
-  //   } = await pdfDocument.getMetadata();
-
-  //   if (pdfDocument !== this.pdfDocument) {
-  //     return; // The document was closed while the metadata resolved.
-  //   }
-  //   this.documentInfo = info;
-  //   this.metadata = metadata;
-  //   this.contentDispositionFilename = contentDispositionFilename;
-
-  //   // Provides some basic debug information
-  //   console.log(
-  //     `PDF ${pdfDocument.fingerprint} [${info.PDFFormatVersion} ` +
-  //       `${(info.Producer || "-").trim()} / ${(info.Creator || "-").trim()}] ` +
-  //       `(PDF.js: ${version || "-"}` +
-  //       `${this.pdfViewer.enableWebGL ? " [WebGL]" : ""})`
-  //   );
-
-  //   let pdfTitle;
-  //   const infoTitle = info && info.Title;
-  //   if (infoTitle) {
-  //     pdfTitle = infoTitle;
-  //   }
-  //   const metadataTitle = metadata && metadata.get("dc:title");
-  //   if (metadataTitle) {
-  //     // Ghostscript can produce invalid 'dc:title' Metadata entries:
-  //     //  - The title may be "Untitled" (fixes bug 1031612).
-  //     //  - The title may contain incorrectly encoded characters, which thus
-  //     //    looks broken, hence we ignore the Metadata entry when it
-  //     //    contains characters from the Specials Unicode block
-  //     //    (fixes bug 1605526).
-  //     if (
-  //       metadataTitle !== "Untitled" &&
-  //       !/[\uFFF0-\uFFFF]/g.test(metadataTitle)
-  //     ) {
-  //       pdfTitle = metadataTitle;
-  //     }
-  //   }
-  //   if (pdfTitle) {
-  //     this.setTitle(
-  //       `${pdfTitle} - ${contentDispositionFilename || document.title}`
-  //     );
-  //   } else if (contentDispositionFilename) {
-  //     this.setTitle(contentDispositionFilename);
-  //   }
-
-  //   if (info.IsXFAPresent && !info.IsAcroFormPresent) {
-  //     console.warn("Warning: XFA is not supported");
-  //     this._delayedFallback(UNSUPPORTED_FEATURES.forms);
-  //   } else if (
-  //     (info.IsAcroFormPresent || info.IsXFAPresent) &&
-  //     !this.pdfViewer.renderInteractiveForms
-  //   ) {
-  //     console.warn("Warning: Interactive form support is not enabled");
-  //     this._delayedFallback(UNSUPPORTED_FEATURES.forms);
-  //   }
-
-  //   // Telemetry labels must be C++ variable friendly.
-  //   let versionId = "other";
-  //   if (KNOWN_VERSIONS.includes(info.PDFFormatVersion)) {
-  //     versionId = `v${info.PDFFormatVersion.replace(".", "_")}`;
-  //   }
-  //   let generatorId = "other";
-  //   if (info.Producer) {
-  //     const producer = info.Producer.toLowerCase();
-  //     KNOWN_GENERATORS.some(function (generator) {
-  //       if (!producer.includes(generator)) {
-  //         return false;
-  //       }
-  //       generatorId = generator.replace(/[ .-]/g, "_");
-  //       return true;
-  //     });
-  //   }
-  //   let formType = null;
-  //   if (info.IsXFAPresent) {
-  //     formType = "xfa";
-  //   } else if (info.IsAcroFormPresent) {
-  //     formType = "acroform";
-  //   }
-  //   this.externalServices.reportTelemetry({
-  //     type: "documentInfo",
-  //     version: versionId,
-  //     generator: generatorId,
-  //     formType,
-  //   });
-  // },
-
-  // async _initializePageLabels(pdfDocument) {
-  //   const labels = await pdfDocument.getPageLabels();
-
-  //   if (pdfDocument !== this.pdfDocument) {
-  //     return; // The document was closed while the page labels resolved.
-  //   }
-  //   if (!labels || AppOptions.get("disablePageLabels")) {
-  //     return;
-  //   }
-  //   const numLabels = labels.length;
-  //   if (numLabels !== this.pagesCount) {
-  //     console.error(
-  //       "The number of Page Labels does not match the number of pages in the document."
-  //     );
-  //     return;
-  //   }
-  //   let i = 0;
-  //   // Ignore page labels that correspond to standard page numbering.
-  //   while (i < numLabels && labels[i] === (i + 1).toString()) {
-  //     i++;
-  //   }
-  //   if (i === numLabels) {
-  //     return;
-  //   }
-  //   const { pdfViewer, pdfThumbnailViewer, toolbar } = this;
-
-  //   pdfViewer.setPageLabels(labels);
-  //   pdfThumbnailViewer.setPageLabels(labels);
-
-  //   // Changing toolbar page display to use labels and we need to set
-  //   // the label of the current page.
-  //   toolbar.setPagesCount(numLabels, true);
-  //   toolbar.setPageNumber(
-  //     pdfViewer.currentPageNumber,
-  //     pdfViewer.currentPageLabel
-  //   );
-  // },
-
-  // async _initializePermissions(pdfDocument) {
-  //   const permissions = await pdfDocument.getPermissions();
-
-  //   if (pdfDocument !== this.pdfDocument) {
-  //     return; // The document was closed while the permissions resolved.
-  //   }
-  //   if (!permissions || !AppOptions.get("enablePermissions")) {
-  //     return;
-  //   }
-  //   // Currently only the "copy"-permission is supported.
-  //   if (!permissions.includes(PermissionFlag.COPY)) {
-  //     this.appConfig.viewerContainer.classList.add(ENABLE_PERMISSIONS_CLASS);
-  //   }
-  // },
 
   // 设置初始化页面的位置 历史记录
   setInitialView( storedHash, { rotation, sidebarView, scrollMode, spreadMode } = {} ) {
@@ -1541,15 +1136,6 @@ const PDFViewerApplication = {
     this.pdfRenderingQueue.renderHighestPriority();
   },
 
-  // rotatePages(delta) {
-  //   if (!this.pdfDocument) {
-  //     return;
-  //   }
-  //   const newRotation = (this.pdfViewer.pagesRotation + 360 + delta) % 360;
-  //   this.pdfViewer.pagesRotation = newRotation;
-  //   // Note that the thumbnail viewer is updated, and rendering is triggered,
-  //   // in the 'rotationchanging' event handler.
-  // },
 
   requestPresentationMode() {
     if (!this.pdfPresentationMode) {
@@ -1649,41 +1235,8 @@ const PDFViewerApplication = {
     // window.addEventListener("afterprint", _boundEvents.windowAfterPrint);
   },
 
-  // accumulateWheelTicks(ticks) {
-  //   // If the scroll direction changed, reset the accumulated wheel ticks.
-  //   if (
-  //     (this._wheelUnusedTicks > 0 && ticks < 0) ||
-  //     (this._wheelUnusedTicks < 0 && ticks > 0)
-  //   ) {
-  //     this._wheelUnusedTicks = 0;
-  //   }
-  //   this._wheelUnusedTicks += ticks;
-  //   const wholeTicks =
-  //     Math.sign(this._wheelUnusedTicks) *
-  //     Math.floor(Math.abs(this._wheelUnusedTicks));
-  //   this._wheelUnusedTicks -= wholeTicks;
-  //   return wholeTicks;
-  // },
 };
 
-// async function loadFakeWorker() {
-//   if (!GlobalWorkerOptions.workerSrc) {
-//     GlobalWorkerOptions.workerSrc = AppOptions.get("workerSrc");
-//   }
-//   if (typeof PDFJSDev === "undefined" || !PDFJSDev.test("PRODUCTION")) {
-//     window.pdfjsWorker = await import("pdfjs/core/worker.js");
-//     return undefined;
-//   }
-//   return loadScript(PDFWorker.getWorkerSrc());
-// }
-
-// function loadAndEnablePDFBug(enabledTabs) {
-//   const appConfig = PDFViewerApplication.appConfig;
-//   return loadScript(appConfig.debuggerScriptPath).then(function () {
-//     PDFBug.enable(enabledTabs);
-//     PDFBug.init({ OPS }, appConfig.mainContainer);
-//   });
-// }
 
 function webViewerInitialized() {
   const appConfig = PDFViewerApplication.appConfig;
@@ -1943,25 +1496,7 @@ function webViewerSpreadModeChanged(evt) {
   }
 }
 
-function webViewerPresentationMode() {
-  PDFViewerApplication.requestPresentationMode();
-}
-// function webViewerDownloadOrSave(sourceEventType) {
-//   if (
-//     PDFViewerApplication.pdfDocument &&
-//     PDFViewerApplication.pdfDocument.annotationStorage.size > 0
-//   ) {
-//     PDFViewerApplication.save({ sourceEventType });
-//   } else {
-//     PDFViewerApplication.download({ sourceEventType });
-//   }
-// }
-function webViewerDownload() {
-  webViewerDownloadOrSave("download");
-}
-function webViewerSave() {
-  webViewerDownloadOrSave("save");
-}
+
 
 // 去第一页
 function webViewerFirstPage() {
@@ -2089,21 +1624,7 @@ function webViewerPageChanging({ pageNumber, pageLabel }) {
   }
 }
 
-function beforeUnload(evt) {
-  debugger;
-  evt.preventDefault();
-  evt.returnValue = "";
-  return false;
-}
 
-/**
- * Converts API PageLayout values to the format used by `PDFViewer`.
- * NOTE: This is supported to the extent that the viewer implements the
- *       necessary Scroll/Spread modes (since SinglePage, TwoPageLeft,
- *       and TwoPageRight all suggests using non-continuous scrolling).
- * @param {string} mode - The API PageLayout value.
- * @returns {number} A value from {SpreadMode}.
- */
 function apiPageLayoutToSpreadMode(layout) {
   switch (layout) {
     case "SinglePage":
@@ -2119,14 +1640,6 @@ function apiPageLayoutToSpreadMode(layout) {
   return SpreadMode.NONE; // Default value.
 }
 
-/**
- * Converts API PageMode values to the format used by `PDFSidebar`.
- * NOTE: There's also a "FullScreen" parameter which is not possible to support,
- *       since the Fullscreen API used in browsers requires that entering
- *       fullscreen mode only occurs as a result of a user-initiated event.
- * @param {string} mode - The API PageMode value.
- * @returns {number} A value from {SidebarView}.
- */
 function apiPageModeToSidebarView(mode) {
   switch (mode) {
     case "UseNone":
