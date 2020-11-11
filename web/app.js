@@ -1,116 +1,48 @@
 import {
-  animationStarted,
-  AutoPrintRegExp,
-  DEFAULT_SCALE_VALUE,
   EventBus,
-  generateRandomStringForSandbox,
-  getActiveOrFocusedElement,
   getPDFFileNameFromURL,
-  isValidRotation,
-  isValidScrollMode,
-  isValidSpreadMode,
-  MAX_SCALE,
-  MIN_SCALE,
-  noContextMenuHandler,
-  normalizeWheelEventDirection,
   parseQueryString,
-  PresentationModeState,
-  ProgressBar,
   RendererType,
-  ScrollMode,
-  SpreadMode,
-  TextLayerMode,
 } from "./ui_utils.js";
 import { AppOptions, OptionKind } from "./app_options.js";
 import {
-  build,
-  createPromiseCapability,
   getDocument,
-  getFilenameFromUrl,
   GlobalWorkerOptions,
-  InvalidPDFException,
-  LinkTarget,
-  loadScript,
-  MissingPDFException,
-  OPS,
-  PDFWorker,
-  PermissionFlag,
-  shadow,
-  UnexpectedResponseException,
-  UNSUPPORTED_FEATURES,
-  version,
 } from "pdfjs-lib";
-import { CursorTool, PDFCursorTools } from "./pdf_cursor_tools.js";
 import { PDFRenderingQueue, RenderingStates } from "./pdf_rendering_queue.js";
 import { PDFSidebar, SidebarView } from "./pdf_sidebar.js";
 import { OverlayManager } from "./overlay_manager.js";
 import { PasswordPrompt } from "./password_prompt.js";
 import { PDFAttachmentViewer } from "./pdf_attachment_viewer.js";
-import { PDFDocumentProperties } from "./pdf_document_properties.js";
-import { PDFFindBar } from "./pdf_find_bar.js";
-import { PDFFindController } from "./pdf_find_controller.js";
-import { PDFHistory } from "./pdf_history.js";
 import { PDFLayerViewer } from "./pdf_layer_viewer.js";
 import { PDFLinkService } from "./pdf_link_service.js";
 import { PDFOutlineViewer } from "./pdf_outline_viewer.js";
-import { PDFPresentationMode } from "./pdf_presentation_mode.js";
 import { PDFSidebarResizer } from "./pdf_sidebar_resizer.js";
 import { PDFThumbnailViewer } from "./pdf_thumbnail_viewer.js";
 import { PDFViewer } from "./pdf_viewer.js";
-import { SecondaryToolbar } from "./secondary_toolbar.js";
 import { Toolbar } from "./toolbar.js";
-import { viewerCompatibilityParams } from "./viewer_compatibility.js";
-import { ViewHistory } from "./view_history.js";
-
-const DEFAULT_SCALE_DELTA = 1.1;
-const DISABLE_AUTO_FETCH_LOADING_BAR_TIMEOUT = 5000; // ms
-const FORCE_PAGES_LOADED_TIMEOUT = 10000; // ms
-const WHEEL_ZOOM_DISABLED_TIMEOUT = 1000; // ms
-const ENABLE_PERMISSIONS_CLASS = "enablePermissions";
-
-
 
 const PDFViewerApplication = {
-  // initialBookmark: document.location.hash.substring(1),
-  // _initializedCapability: createPromiseCapability(),
-  // fellback: false,
   appConfig: null,
   pdfDocument: null,
   pdfLoadingTask: null,
-  // printService: null,
   pdfViewer: null, // PDFViewer
   pdfThumbnailViewer: null, //PDFThumbnailViewer
   pdfRenderingQueue: null, // PDFRenderingQueue
   pdfPresentationMode: null, // PDFPresentationMode
   pdfDocumentProperties: null, // PDFDocumentProperties
   pdfLinkService: null, // PDFLinkService
-  // pdfHistory: null, // PDFHistory
   pdfSidebar: null, // PDFSidebar
   pdfSidebarResizer: null, // PDFSidebarResizer
   pdfOutlineViewer: null, // PDFOutlineViewer
   pdfAttachmentViewer: null, // PDFAttachmentViewer
   pdfLayerViewer: null, // PDFLayerViewer
-  // pdfCursorTools: null, // PDFCursorTools
-  store: null, // ViewHistory
-  // downloadManager: null, // DownloadManager
   overlayManager: null, // OverlayManager
-  // preferences: null, // Preferences
   toolbar: null, // Toolbar
-  // secondaryToolbar: null, // SecondaryToolbar
   eventBus: null, // EventBus
-  // l10n: null, // IL10n
   isInitialViewSet: false,
-  // downloadComplete: false,
-  // isViewerEmbedded: window.parent !== window,
   url: "",
   baseUrl: "",
-  // externalServices: DefaultExternalServices,
-  // _boundEvents: {},
-  // contentDispositionFilename: null,
-  // triggerDelayedFallback: null,
-  // _saveInProgress: false,
-  // _wheelUnusedTicks: 0,
-  // _idleCallbacks: new Set(),
 
   async initialize(appConfig) {
     this.appConfig = appConfig;
@@ -156,11 +88,8 @@ const PDFViewerApplication = {
       eventBus,
       renderingQueue: pdfRenderingQueue,
       linkService: pdfLinkService,
-      // downloadManager,
-      // findController,
       renderer: AppOptions.get("renderer"),
       enableWebGL: AppOptions.get("enableWebGL"),
-      // l10n: this.l10n,
       textLayerMode: AppOptions.get("textLayerMode"),
       imageResourcesPath: AppOptions.get("imageResourcesPath"),
       renderInteractiveForms: AppOptions.get("renderInteractiveForms"),
@@ -237,14 +166,6 @@ const PDFViewerApplication = {
       });
   },
 
-  // get initialized() {
-  //   return this._initializedCapability.settled;
-  // },
-
-  // get initializedPromise() {
-  //   return this._initializedCapability.promise;
-  // },
-
   get pagesCount() {
     return this.pdfDocument ? this.pdfDocument.numPages : 0;
   },
@@ -256,7 +177,6 @@ const PDFViewerApplication = {
   set page(val) {
     this.pdfViewer.currentPageNumber = val;
   },
-
 
   setTitleUsingUrl(url = "") {
     this.url = url;
@@ -293,7 +213,6 @@ const PDFViewerApplication = {
       this.passwordPrompt.open();
     };
 
-
     return loadingTask.promise.then(
       pdfDocument => {
         this.load(pdfDocument);
@@ -303,7 +222,6 @@ const PDFViewerApplication = {
       }
     );
   },
-
 
   load(pdfDocument) {
     this.pdfDocument = pdfDocument;
@@ -318,25 +236,6 @@ const PDFViewerApplication = {
 
     pdfThumbnailViewer.setDocument(pdfDocument);
 
-    this.store = new ViewHistory(pdfDocument.fingerprint);
-
-    var storedPromise = this.store
-      .getMultiple({
-        page: null,
-        zoom: DEFAULT_SCALE_VALUE,
-        scrollLeft: "0",
-        scrollTop: "0",
-        rotation: null,
-        sidebarView: SidebarView.UNKNOWN,
-        scrollMode: ScrollMode.UNKNOWN,
-        spreadMode: SpreadMode.UNKNOWN,
-      })
-      .catch(() => {
-        return Object.create(null);
-      });
-
-    console.log(this.store);
-    console.log(storedPromise);
 
     firstPagePromise.then(pdfPage => {
       pdfViewer.update();
@@ -355,7 +254,6 @@ const PDFViewerApplication = {
     });
   },
 
-
   cleanup() {
     if (!this.pdfDocument) {
       return; // run cleanup when document is loaded
@@ -370,7 +268,6 @@ const PDFViewerApplication = {
   },
 
   forceRendering() {
-    // this.pdfRenderingQueue.printing = !!this.printService;
     this.pdfRenderingQueue.isThumbnailViewEnabled = this.pdfSidebar.isThumbnailViewVisible;
     this.pdfRenderingQueue.renderHighestPriority();
   },
@@ -378,105 +275,33 @@ const PDFViewerApplication = {
   bindEvents() {
     const { eventBus, _boundEvents } = this;
 
-    // _boundEvents.beforePrint = this.beforePrint.bind(this);
-    // _boundEvents.afterPrint = this.afterPrint.bind(this);
-
-    // eventBus._on("resize", webViewerResize);
-    // eventBus._on("hashchange", webViewerHashchange);
-    // eventBus._on("beforeprint", _boundEvents.beforePrint);
-    // eventBus._on("afterprint", _boundEvents.afterPrint);
     eventBus._on("pagerendered", webViewerPageRendered);
     eventBus._on("updateviewarea", webViewerUpdateViewarea);
     eventBus._on("pagechanging", webViewerPageChanging);
     eventBus._on("scalechanging", webViewerScaleChanging);
-    // eventBus._on("rotationchanging", webViewerRotationChanging);
     eventBus._on("sidebarviewchanged", webViewerSidebarViewChanged);
     eventBus._on("pagemode", webViewerPageMode);
-    // eventBus._on("namedaction", webViewerNamedAction);
-    // eventBus._on("presentationmodechanged", webViewerPresentationModeChanged);
-    // eventBus._on("presentationmode", webViewerPresentationMode);
-    // eventBus._on("print", webViewerPrint);
-    // eventBus._on("download", webViewerDownload);
-    // eventBus._on("save", webViewerSave);
     eventBus._on("firstpage", webViewerFirstPage);
     eventBus._on("lastpage", webViewerLastPage);
     eventBus._on("nextpage", webViewerNextPage);
     eventBus._on("previouspage", webViewerPreviousPage);
 
-    // eventBus._on("zoomin", webViewerZoomIn);
-    // eventBus._on("zoomout", webViewerZoomOut);
-    // eventBus._on("zoomreset", webViewerZoomReset);
     eventBus._on("pagenumberchanged", webViewerPageNumberChanged);
-    // eventBus._on("scalechanged", webViewerScaleChanged);
-    // eventBus._on("rotatecw", webViewerRotateCw);
-    // eventBus._on("rotateccw", webViewerRotateCcw);
-    // eventBus._on("optionalcontentconfig", webViewerOptionalContentConfig);
     eventBus._on("switchscrollmode", webViewerSwitchScrollMode);
-    eventBus._on("scrollmodechanged", webViewerScrollModeChanged);
     eventBus._on("switchspreadmode", webViewerSwitchSpreadMode);
-    eventBus._on("spreadmodechanged", webViewerSpreadModeChanged);
     eventBus._on("documentproperties", webViewerDocumentProperties);
 
     eventBus._on("find", webViewerFind);
     eventBus._on("findfromurlhash", webViewerFindFromUrlHash);
-    // eventBus._on("updatefindmatchescount", webViewerUpdateFindMatchesCount);
-    // eventBus._on("updatefindcontrolstate", webViewerUpdateFindControlState);
-
-    // if (AppOptions.get("pdfBug")) {
-    //   _boundEvents.reportPageStatsPDFBug = reportPageStatsPDFBug;
-    //   eventBus._on("pagerendered", _boundEvents.reportPageStatsPDFBug);
-    //   eventBus._on("pagechanging", _boundEvents.reportPageStatsPDFBug);
-    // }
-    // if (typeof PDFJSDev === "undefined" || PDFJSDev.test("GENERIC")) {
-    //   eventBus._on("fileinputchange", webViewerFileInputChange);
-    //   eventBus._on("openfile", webViewerOpenFile);
-    // }
-  },
-
-  bindWindowEvents() {
-    const { eventBus, _boundEvents } = this;
-
-    // _boundEvents.windowResize = () => {
-    //   eventBus.dispatch("resize", { source: window });
-    // };
-    // _boundEvents.windowHashChange = () => {
-    //   eventBus.dispatch("hashchange", {
-    //     source: window,
-    //     hash: document.location.hash.substring(1),
-    //   });
-    // };
-    // _boundEvents.windowBeforePrint = () => {
-    //   eventBus.dispatch("beforeprint", { source: window });
-    // };
-    // _boundEvents.windowAfterPrint = () => {
-    //   eventBus.dispatch("afterprint", { source: window });
-    // };
-
-    // window.addEventListener("visibilitychange", webViewerVisibilityChange);
-    // window.addEventListener("wheel", webViewerWheel, { passive: false });
-    // window.addEventListener("touchstart", webViewerTouchStart, {
-    //   passive: false,
-    // });
-    // window.addEventListener("click", webViewerClick);
-    // window.addEventListener("keydown", webViewerKeyDown);
-    // window.addEventListener("keyup", webViewerKeyUp);
-    // window.addEventListener("resize", _boundEvents.windowResize);
-    // window.addEventListener("hashchange", _boundEvents.windowHashChange);
-    // window.addEventListener("beforeprint", _boundEvents.windowBeforePrint);
-    // window.addEventListener("afterprint", _boundEvents.windowAfterPrint);
   },
 };
 
-
 // 页面渲染完毕
 function webViewerPageRendered({ pageNumber, timestamp, error }) {
-  // If the page is still visible when it has finished rendering,
-  // ensure that the page number input loading indicator is hidden.
   if (pageNumber === PDFViewerApplication.page) {
     PDFViewerApplication.toolbar.updateLoadingIndicatorState(false);
   }
 
-  // Use the rendered page to set the corresponding thumbnail image.
   if (PDFViewerApplication.pdfSidebar.isThumbnailViewVisible) {
     const pageView = PDFViewerApplication.pdfViewer.getPageView(pageNumber - 1);
     const thumbnailView = PDFViewerApplication.pdfThumbnailViewer.getThumbnail(pageNumber - 1);
@@ -484,19 +309,6 @@ function webViewerPageRendered({ pageNumber, timestamp, error }) {
       thumbnailView.setImage(pageView);
     }
   }
-
-  // PDFViewerApplication.externalServices.reportTelemetry({
-  //   type: "pageInfo",
-  //   timestamp,
-  // });
-  // // It is a good time to report stream and font types.
-  // PDFViewerApplication.pdfDocument.getStats().then(function (stats) {
-  //   debugger
-  //   PDFViewerApplication.externalServices.reportTelemetry({
-  //     type: "documentStats",
-  //     stats,
-  //   });
-  // });
 }
 
 // 切换缩略图 大纲 等
@@ -532,59 +344,17 @@ function webViewerSidebarViewChanged(evt) {
   console.log(evt);
   PDFViewerApplication.pdfRenderingQueue.isThumbnailViewEnabled = PDFViewerApplication.pdfSidebar.isThumbnailViewVisible;
 
-  const store = PDFViewerApplication.store;
-  if (store && PDFViewerApplication.isInitialViewSet) {
-    // Only update the storage when the document has been loaded *and* rendered.
-    store.set("sidebarView", evt.view).catch(function () {});
-  }
 }
 
 // 页面位置发生变更
 function webViewerUpdateViewarea(evt) {
-  // console.log("webViewerUpdateViewarea");
-  // console.log(evt);
-  const location = evt.location,
-    store = PDFViewerApplication.store;
-
-  if (store && PDFViewerApplication.isInitialViewSet) {
-    store
-      .setMultiple({
-        page: location.pageNumber,
-        zoom: location.scale,
-        scrollLeft: location.left,
-        scrollTop: location.top,
-        rotation: location.rotation,
-      })
-      .catch(function () {
-        /* unable to write to storage */
-      });
-  }
-  const href = PDFViewerApplication.pdfLinkService.getAnchorUrl(location.pdfOpenParams);
-  PDFViewerApplication.appConfig.toolbar.viewBookmark.href = href;
-  // PDFViewerApplication.appConfig.secondaryToolbar.viewBookmarkButton.href = href;
 
   // Show/hide the loading indicator in the page number input element.
-  const currentPage = PDFViewerApplication.pdfViewer.getPageView(/* index = */ PDFViewerApplication.page - 1);
+  const currentPage = PDFViewerApplication.pdfViewer.getPageView(PDFViewerApplication.page - 1);
   const loading = (currentPage && currentPage.renderingState) !== RenderingStates.FINISHED;
   PDFViewerApplication.toolbar.updateLoadingIndicatorState(loading);
 }
 
-function webViewerScrollModeChanged(evt) {
-  const store = PDFViewerApplication.store;
-  if (store && PDFViewerApplication.isInitialViewSet) {
-    // Only update the storage when the document has been loaded *and* rendered.
-    store.set("scrollMode", evt.mode).catch(function () {});
-  }
-}
-
-// 视图模式切换完毕
-function webViewerSpreadModeChanged(evt) {
-  const store = PDFViewerApplication.store;
-  if (store && PDFViewerApplication.isInitialViewSet) {
-    // Only update the storage when the document has been loaded *and* rendered.
-    store.set("spreadMode", evt.mode).catch(function () {});
-  }
-}
 
 // 去第一页
 function webViewerFirstPage() {
@@ -659,7 +429,6 @@ function webViewerFindFromUrlHash(evt) {
   });
 }
 
-
 // 缩放比例发生变化
 function webViewerScaleChanging(evt) {
   // console.log("webViewerScaleChanging")
@@ -671,18 +440,11 @@ function webViewerScaleChanging(evt) {
 
 // 当前处于第几个页面
 function webViewerPageChanging({ pageNumber, pageLabel }) {
-  // console.log("webViewerPageChanging");
-  // console.log(pageNumber, pageLabel);
   PDFViewerApplication.toolbar.setPageNumber(pageNumber, pageLabel);
-  // PDFViewerApplication.secondaryToolbar.setPageNumber(pageNumber);
 
   if (PDFViewerApplication.pdfSidebar.isThumbnailViewVisible) {
     PDFViewerApplication.pdfThumbnailViewer.scrollThumbnailIntoView(pageNumber);
   }
 }
 
-export {
-  PDFViewerApplication,
-  // DefaultExternalServices,
-  // PDFPrintServiceFactory,
-};
+export { PDFViewerApplication };
