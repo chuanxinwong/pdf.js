@@ -456,7 +456,7 @@ class PDFFindController {
     }
 
     let promise = Promise.resolve();
-    for (let i = 0, ii = this._linkService.pagesCount; i < ii; i++) {
+    for (let i = 0, ii = this._pdfDocument.numPages; i < ii; i++) {
       const extractTextCapability = createPromiseCapability();
       this._extractTextPromises[i] = extractTextCapability.promise;
 

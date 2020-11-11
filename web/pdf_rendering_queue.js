@@ -144,6 +144,8 @@ class PDFRenderingQueue {
    * @param {IRenderableView} view
    */
   renderView(view) {
+    console.log(view)
+    console.log(view.renderingState)
     switch (view.renderingState) {
       case RenderingStates.FINISHED:
         return false;

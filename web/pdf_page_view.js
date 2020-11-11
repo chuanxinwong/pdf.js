@@ -13,21 +13,8 @@
  * limitations under the License.
  */
 
-import {
-  approximateFraction,
-  CSS_UNITS,
-  DEFAULT_SCALE,
-  getOutputScale,
-  NullL10n,
-  RendererType,
-  roundToDivide,
-  TextLayerMode,
-} from "./ui_utils.js";
-import {
-  createPromiseCapability,
-  RenderingCancelledException,
-  SVGGraphics,
-} from "pdfjs-lib";
+import { approximateFraction, CSS_UNITS, DEFAULT_SCALE, getOutputScale, NullL10n, RendererType, roundToDivide, TextLayerMode } from "./ui_utils.js";
+import { createPromiseCapability, RenderingCancelledException, SVGGraphics } from "pdfjs-lib";
 import { RenderingStates } from "./pdf_rendering_queue.js";
 import { viewerCompatibilityParams } from "./viewer_compatibility.js";
 
@@ -88,17 +75,11 @@ class PDFPageView {
     this.viewport = defaultViewport;
     this.pdfPageRotate = defaultViewport.rotation;
     this._annotationStorage = options.annotationStorage || null;
-    this._optionalContentConfigPromise =
-      options.optionalContentConfigPromise || null;
+    this._optionalContentConfigPromise = options.optionalContentConfigPromise || null;
     this.hasRestrictedScaling = false;
-    this.textLayerMode = Number.isInteger(options.textLayerMode)
-      ? options.textLayerMode
-      : TextLayerMode.ENABLE;
+    this.textLayerMode = Number.isInteger(options.textLayerMode) ? options.textLayerMode : TextLayerMode.ENABLE;
     this.imageResourcesPath = options.imageResourcesPath || "";
-    this.renderInteractiveForms =
-      typeof options.renderInteractiveForms === "boolean"
-        ? options.renderInteractiveForms
-        : true;
+    this.renderInteractiveForms = typeof options.renderInteractiveForms === "boolean" ? options.renderInteractiveForms : true;
     this.useOnlyCssZoom = options.useOnlyCssZoom || false;
     this.maxCanvasPixels = options.maxCanvasPixels || MAX_CANVAS_PIXELS;
 
@@ -198,9 +179,7 @@ class PDFPageView {
 
     const childNodes = div.childNodes;
     const currentZoomLayerNode = (keepZoomLayer && this.zoomLayer) || null;
-    const currentAnnotationNode =
-      (keepAnnotations && this.annotationLayer && this.annotationLayer.div) ||
-      null;
+    const currentAnnotationNode = (keepAnnotations && this.annotationLayer && this.annotationLayer.div) || null;
     for (let i = childNodes.length - 1; i >= 0; i--) {
       const node = childNodes[i];
       if (currentZoomLayerNode === node || currentAnnotationNode === node) {
@@ -272,20 +251,13 @@ class PDFPageView {
     let isScalingRestricted = false;
     if (this.canvas && this.maxCanvasPixels > 0) {
       const outputScale = this.outputScale;
-      if (
-        ((Math.floor(this.viewport.width) * outputScale.sx) | 0) *
-          ((Math.floor(this.viewport.height) * outputScale.sy) | 0) >
-        this.maxCanvasPixels
-      ) {
+      if (((Math.floor(this.viewport.width) * outputScale.sx) | 0) * ((Math.floor(this.viewport.height) * outputScale.sy) | 0) > this.maxCanvasPixels) {
         isScalingRestricted = true;
       }
     }
 
     if (this.canvas) {
-      if (
-        this.useOnlyCssZoom ||
-        (this.hasRestrictedScaling && isScalingRestricted)
-      ) {
+      if (this.useOnlyCssZoom || (this.hasRestrictedScaling && isScalingRestricted)) {
         this.cssTransform(this.canvas, true);
 
         this.eventBus.dispatch("pagerendered", {
@@ -334,13 +306,10 @@ class PDFPageView {
     const width = this.viewport.width;
     const height = this.viewport.height;
     const div = this.div;
-    target.style.width = target.parentNode.style.width = div.style.width =
-      Math.floor(width) + "px";
-    target.style.height = target.parentNode.style.height = div.style.height =
-      Math.floor(height) + "px";
+    target.style.width = target.parentNode.style.width = div.style.width = Math.floor(width) + "px";
+    target.style.height = target.parentNode.style.height = div.style.height = Math.floor(height) + "px";
     // The canvas may have been originally rotated; rotate relative to that.
-    const relativeRotation =
-      this.viewport.rotation - this.paintedViewportMap.get(target).rotation;
+    const relativeRotation = this.viewport.rotation - this.paintedViewportMap.get(target).rotation;
     const absRotation = Math.abs(relativeRotation);
     let scaleX = 1,
       scaleY = 1;
@@ -357,8 +326,7 @@ class PDFPageView {
       // TODO: This could probably be simplified by drawing the text layer in
       // one orientation and then rotating overall.
       const textLayerViewport = this.textLayer.viewport;
-      const textRelativeRotation =
-        this.viewport.rotation - textLayerViewport.rotation;
+      const textRelativeRotation = this.viewport.rotation - textLayerViewport.rotation;
       const textAbsRotation = Math.abs(textRelativeRotation);
       let scale = width / textLayerViewport.width;
       if (textAbsRotation === 90 || textAbsRotation === 270) {
@@ -387,10 +355,7 @@ class PDFPageView {
           break;
       }
 
-      textLayerDiv.style.transform =
-        `rotate(${textAbsRotation}deg) ` +
-        `scale(${scale}) ` +
-        `translate(${transX}, ${transY})`;
+      textLayerDiv.style.transform = `rotate(${textAbsRotation}deg) ` + `scale(${scale}) ` + `translate(${transX}, ${transY})`;
       textLayerDiv.style.transformOrigin = "0% 0%";
     }
 
@@ -457,19 +422,15 @@ class PDFPageView {
         div.appendChild(textLayerDiv);
       }
 
-      textLayer = this.textLayerFactory.createTextLayerBuilder(
-        textLayerDiv,
-        this.id - 1,
-        this.viewport,
-        this.textLayerMode === TextLayerMode.ENABLE_ENHANCE,
-        this.eventBus
-      );
+      textLayer = this.textLayerFactory.createTextLayerBuilder(textLayerDiv, this.id - 1, this.viewport, this.textLayerMode === TextLayerMode.ENABLE_ENHANCE, this.eventBus);
     }
     this.textLayer = textLayer;
 
     let renderContinueCallback = null;
     if (this.renderingQueue) {
       renderContinueCallback = cont => {
+        console.log("renderContinueCallback = cont => {");
+        console.log(cont);
         if (!this.renderingQueue.isHighestPriority(this)) {
           this.renderingState = RenderingStates.PAUSED;
           this.resume = () => {
@@ -517,10 +478,7 @@ class PDFPageView {
       }
     };
 
-    const paintTask =
-      this.renderer === RendererType.SVG
-        ? this.paintOnSvg(canvasWrapper)
-        : this.paintOnCanvas(canvasWrapper);
+    const paintTask = this.renderer === RendererType.SVG ? this.paintOnSvg(canvasWrapper) : this.paintOnCanvas(canvasWrapper);
     paintTask.onRenderContinue = renderContinueCallback;
     this.paintTask = paintTask;
 
@@ -543,14 +501,7 @@ class PDFPageView {
 
     if (this.annotationLayerFactory) {
       if (!this.annotationLayer) {
-        this.annotationLayer = this.annotationLayerFactory.createAnnotationLayerBuilder(
-          div,
-          pdfPage,
-          this._annotationStorage,
-          this.imageResourcesPath,
-          this.renderInteractiveForms,
-          this.l10n
-        );
+        this.annotationLayer = this.annotationLayerFactory.createAnnotationLayerBuilder(div, pdfPage, this._annotationStorage, this.imageResourcesPath, this.renderInteractiveForms, this.l10n);
       }
       this._renderAnnotationLayer();
     }
@@ -577,11 +528,9 @@ class PDFPageView {
 
     const viewport = this.viewport;
     const canvas = document.createElement("canvas");
-    this.l10n
-      .get("page_canvas", { page: this.id }, "Page {{page}}")
-      .then(msg => {
-        canvas.setAttribute("aria-label", msg);
-      });
+    this.l10n.get("page_canvas", { page: this.id }, "Page {{page}}").then(msg => {
+      canvas.setAttribute("aria-label", msg);
+    });
 
     // Keep the canvas hidden until the first draw callback, or until drawing
     // is complete when `!this.renderingQueue`, to prevent black flickering.
@@ -597,10 +546,7 @@ class PDFPageView {
     canvasWrapper.appendChild(canvas);
     this.canvas = canvas;
 
-    if (
-      typeof PDFJSDev === "undefined" ||
-      PDFJSDev.test("MOZCENTRAL || GENERIC")
-    ) {
+    if (typeof PDFJSDev === "undefined" || PDFJSDev.test("MOZCENTRAL || GENERIC")) {
       canvas.mozOpaque = true;
     }
 
@@ -640,9 +586,7 @@ class PDFPageView {
     this.paintedViewportMap.set(canvas, viewport);
 
     // Rendering area
-    const transform = !outputScale.scaled
-      ? null
-      : [outputScale.sx, 0, 0, outputScale.sy, 0, 0];
+    const transform = !outputScale.scaled ? null : [outputScale.sx, 0, 0, outputScale.sy, 0, 0];
     const renderContext = {
       canvasContext: ctx,
       transform,
@@ -653,6 +597,7 @@ class PDFPageView {
     };
     const renderTask = this.pdfPage.render(renderContext);
     renderTask.onContinue = function (cont) {
+      console.log("renderTask.onContinue");
       showCanvas();
       if (result.onRenderContinue) {
         result.onRenderContinue(cont);
@@ -675,10 +620,7 @@ class PDFPageView {
   }
 
   paintOnSvg(wrapper) {
-    if (
-      typeof PDFJSDev !== "undefined" &&
-      PDFJSDev.test("MOZCENTRAL || CHROME")
-    ) {
+    if (typeof PDFJSDev !== "undefined" && PDFJSDev.test("MOZCENTRAL || CHROME")) {
       // Return a mock object, to prevent errors such as e.g.
       // "TypeError: paintTask.promise is undefined".
       return {
@@ -691,10 +633,7 @@ class PDFPageView {
     let cancelled = false;
     const ensureNotCancelled = () => {
       if (cancelled) {
-        throw new RenderingCancelledException(
-          `Rendering cancelled, page ${this.id}`,
-          "svg"
-        );
+        throw new RenderingCancelledException(`Rendering cancelled, page ${this.id}`, "svg");
       }
     };
 

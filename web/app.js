@@ -16,6 +16,7 @@ import { PasswordPrompt } from "./password_prompt.js";
 import { PDFAttachmentViewer } from "./pdf_attachment_viewer.js";
 import { PDFLayerViewer } from "./pdf_layer_viewer.js";
 import { PDFLinkService } from "./pdf_link_service.js";
+import { PDFFindController } from "./pdf_find_controller.js";
 import { PDFOutlineViewer } from "./pdf_outline_viewer.js";
 import { PDFSidebarResizer } from "./pdf_sidebar_resizer.js";
 import { PDFThumbnailViewer } from "./pdf_thumbnail_viewer.js";
@@ -72,11 +73,14 @@ const PDFViewerApplication = {
     // this.pdfLinkService = pdfLinkService;
 
     // 查看 搜索
-    // const findController = new PDFFindController({
-    //   linkService: pdfLinkService,
-    //   eventBus,
-    // });
-    // this.findController = findController;
+    const findController = new PDFFindController({
+      // linkService: pdfLinkService,
+      eventBus,
+    });
+    this.findController = findController;
+
+    window.findController = findController;
+
 
     const container = appConfig.mainContainer;
     const viewer = appConfig.viewerContainer;
@@ -227,6 +231,8 @@ const PDFViewerApplication = {
     this.pdfDocument = pdfDocument;
 
     // this.pdfLinkService.setDocument(pdfDocument, null);
+
+    this.findController.setDocument(pdfDocument);
 
     const pdfViewer = this.pdfViewer;
     pdfViewer.setDocument(pdfDocument);
