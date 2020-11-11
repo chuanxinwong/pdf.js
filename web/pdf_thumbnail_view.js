@@ -133,12 +133,12 @@ class PDFThumbnailView {
     this.l10n = l10n;
 
     const anchor = document.createElement("a");
-    anchor.href = linkService.getAnchorUrl("#page=" + id);
+    // anchor.href = linkService.getAnchorUrl("#page=" + id);
     this._thumbPageTitle.then(msg => {
       anchor.title = msg;
     });
     anchor.onclick = function () {
-      linkService.goToPage(id);
+      // linkService.goToPage(id);
       return false;
     };
     this.anchor = anchor;

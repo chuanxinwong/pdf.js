@@ -134,7 +134,7 @@ class PDFOutlineViewer extends BaseTreeViewer {
         div.className = "treeItem";
 
         const element = document.createElement("a");
-        this._bindLink(element, item);
+        // this._bindLink(element, item);
         this._setStyles(element, item);
         element.textContent = this._normalizeTextContent(item.title);
 

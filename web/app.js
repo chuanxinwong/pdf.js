@@ -63,13 +63,13 @@ const PDFViewerApplication = {
     pdfRenderingQueue.onIdle = this.cleanup.bind(this);
     this.pdfRenderingQueue = pdfRenderingQueue;
 
-    const pdfLinkService = new PDFLinkService({
-      eventBus,
-      externalLinkTarget: AppOptions.get("externalLinkTarget"),
-      externalLinkRel: AppOptions.get("externalLinkRel"),
-      ignoreDestinationZoom: AppOptions.get("ignoreDestinationZoom"),
-    });
-    this.pdfLinkService = pdfLinkService;
+    // const pdfLinkService = new PDFLinkService({
+    //   eventBus,
+    //   externalLinkTarget: AppOptions.get("externalLinkTarget"),
+    //   externalLinkRel: AppOptions.get("externalLinkRel"),
+    //   ignoreDestinationZoom: AppOptions.get("ignoreDestinationZoom"),
+    // });
+    // this.pdfLinkService = pdfLinkService;
 
     // 查看 搜索
     // const findController = new PDFFindController({
@@ -87,7 +87,7 @@ const PDFViewerApplication = {
       viewer,
       eventBus,
       renderingQueue: pdfRenderingQueue,
-      linkService: pdfLinkService,
+      // linkService: pdfLinkService,
       renderer: AppOptions.get("renderer"),
       enableWebGL: AppOptions.get("enableWebGL"),
       textLayerMode: AppOptions.get("textLayerMode"),
@@ -98,14 +98,14 @@ const PDFViewerApplication = {
       maxCanvasPixels: AppOptions.get("maxCanvasPixels"),
     });
     pdfRenderingQueue.setViewer(this.pdfViewer);
-    pdfLinkService.setViewer(this.pdfViewer);
+    // pdfLinkService.setViewer(this.pdfViewer);
 
     // 缩略图
     this.pdfThumbnailViewer = new PDFThumbnailViewer({
       container: appConfig.sidebar.thumbnailView,
       eventBus,
       renderingQueue: pdfRenderingQueue,
-      linkService: pdfLinkService,
+      // linkService: pdfLinkService,
     });
     pdfRenderingQueue.setThumbnailViewer(this.pdfThumbnailViewer);
 
@@ -118,7 +118,7 @@ const PDFViewerApplication = {
     this.pdfOutlineViewer = new PDFOutlineViewer({
       container: appConfig.sidebar.outlineView,
       eventBus,
-      linkService: pdfLinkService,
+      // linkService: pdfLinkService,
     });
 
     // 附件
@@ -208,7 +208,7 @@ const PDFViewerApplication = {
     this.pdfLoadingTask = loadingTask;
 
     loadingTask.onPassword = (updateCallback, reason) => {
-      this.pdfLinkService.externalLinkEnabled = false;
+      // this.pdfLinkService.externalLinkEnabled = false;
       this.passwordPrompt.setUpdateCallback(updateCallback, reason);
       this.passwordPrompt.open();
     };
@@ -226,7 +226,7 @@ const PDFViewerApplication = {
   load(pdfDocument) {
     this.pdfDocument = pdfDocument;
 
-    this.pdfLinkService.setDocument(pdfDocument, null);
+    // this.pdfLinkService.setDocument(pdfDocument, null);
 
     const pdfViewer = this.pdfViewer;
     pdfViewer.setDocument(pdfDocument);
@@ -255,6 +255,7 @@ const PDFViewerApplication = {
   },
 
   cleanup() {
+    console.log("cleanup ........")
     if (!this.pdfDocument) {
       return; // run cleanup when document is loaded
     }
@@ -382,7 +383,7 @@ function webViewerPageNumberChanged(evt) {
   // Note that for `<input type="number">` HTML elements, an empty string will
   // be returned for non-number inputs; hence we simply do nothing in that case.
   if (evt.value !== "") {
-    PDFViewerApplication.pdfLinkService.goToPage(evt.value);
+    // PDFViewerApplication.pdfLinkService.goToPage(evt.value);
   }
 
   // Ensure that the page number input displays the correct value, even if the
