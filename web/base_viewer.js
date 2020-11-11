@@ -403,20 +403,20 @@ class BaseViewer {
   /**
    * @private
    */
-  _onePageRenderedOrForceFetch() {
-    // Unless the viewer *and* its pages are visible, rendering won't start and
-    // `this._onePageRenderedCapability` thus won't be resolved.
-    // To ensure that automatic printing, on document load, still works even in
-    // those cases we force-allow fetching of all pages when:
-    //  - The viewer is hidden in the DOM, e.g. in a `display: none` <iframe>
-    //    element; fixes bug 1618621.
-    //  - The viewer is visible, but none of the pages are (e.g. if the
-    //    viewer is very small); fixes bug 1618955.
-    if (!this.container.offsetParent || this._getVisiblePages().views.length === 0) {
-      return Promise.resolve();
-    }
-    return this._onePageRenderedCapability.promise;
-  }
+  // _onePageRenderedOrForceFetch() {
+  //   // Unless the viewer *and* its pages are visible, rendering won't start and
+  //   // `this._onePageRenderedCapability` thus won't be resolved.
+  //   // To ensure that automatic printing, on document load, still works even in
+  //   // those cases we force-allow fetching of all pages when:
+  //   //  - The viewer is hidden in the DOM, e.g. in a `display: none` <iframe>
+  //   //    element; fixes bug 1618621.
+  //   //  - The viewer is visible, but none of the pages are (e.g. if the
+  //   //    viewer is very small); fixes bug 1618955.
+  //   if (!this.container.offsetParent || this._getVisiblePages().views.length === 0) {
+  //     return Promise.resolve();
+  //   }
+  //   return this._onePageRenderedCapability.promise;
+  // }
 
   /**
    * @param pdfDocument {PDFDocument}
@@ -441,34 +441,37 @@ class BaseViewer {
     const annotationStorage = pdfDocument.annotationStorage;
     const optionalContentConfigPromise = pdfDocument.getOptionalContentConfig();
 
-    this._pagesCapability.promise.then(() => {
-      this.eventBus.dispatch("pagesloaded", {
-        source: this,
-        pagesCount,
-      });
-    });
+    // this._pagesCapability.promise.then(() => {
+    //   console.log("this._pagesCapability.promise")
+    //   this.eventBus.dispatch("pagesloaded", {
+    //     source: this,
+    //     pagesCount,
+    //   });
+    // });
 
-    this._onBeforeDraw = evt => {
-      const pageView = this._pages[evt.pageNumber - 1];
-      if (!pageView) {
-        return;
-      }
-      // Add the page to the buffer at the start of drawing. That way it can be
-      // evicted from the buffer and destroyed even if we pause its rendering.
-      this._buffer.push(pageView);
-    };
-    this.eventBus._on("pagerender", this._onBeforeDraw);
+    // this._onBeforeDraw = evt => {
+    //   console.log("this._onBeforeDraw")
+    //   const pageView = this._pages[evt.pageNumber - 1];
+    //   if (!pageView) {
+    //     return;
+    //   }
+    //   // Add the page to the buffer at the start of drawing. That way it can be
+    //   // evicted from the buffer and destroyed even if we pause its rendering.
+    //   this._buffer.push(pageView);
+    // };
+    // this.eventBus._on("pagerender", this._onBeforeDraw);
 
-    this._onAfterDraw = evt => {
-      if (evt.cssTransform || this._onePageRenderedCapability.settled) {
-        return;
-      }
-      this._onePageRenderedCapability.resolve();
+    // this._onAfterDraw = evt => {
+    //   console.log("this._onAfterDraw")
+    //   if (evt.cssTransform || this._onePageRenderedCapability.settled) {
+    //     return;
+    //   }
+    //   this._onePageRenderedCapability.resolve();
 
-      this.eventBus._off("pagerendered", this._onAfterDraw);
-      this._onAfterDraw = null;
-    };
-    this.eventBus._on("pagerendered", this._onAfterDraw);
+    //   this.eventBus._off("pagerendered", this._onAfterDraw);
+    //   this._onAfterDraw = null;
+    // };
+    // this.eventBus._on("pagerendered", this._onAfterDraw);
 
     // Fetch a single page so we can get a viewport that will be the default
     // viewport for all pages
@@ -504,7 +507,10 @@ class BaseViewer {
           });
           this._pages.push(pageView);
         }
-        // Set the first `pdfPage` immediately, since it's already loaded,
+
+
+        // debugger
+        // // Set the first `pdfPage` immediately, since it's already loaded,
         // rather than having to repeat the `PDFDocumentProxy.getPage` call in
         // the `this._ensurePdfPageLoaded` method before rendering can start.
         const firstPageView = this._pages[0];
@@ -519,51 +525,51 @@ class BaseViewer {
         // Fetch all the pages since the viewport is needed before printing
         // starts to create the correct size canvas. Wait until one page is
         // rendered so we don't tie up too many resources early on.
-        this._onePageRenderedOrForceFetch().then(() => {
-          if (this.findController) {
-            this.findController.setDocument(pdfDocument); // Enable searching.
-          }
+        // this._onePageRenderedOrForceFetch().then(() => {
+        //   if (this.findController) {
+        //     this.findController.setDocument(pdfDocument); // Enable searching.
+        //   }
 
-          // In addition to 'disableAutoFetch' being set, also attempt to reduce
-          // resource usage when loading *very* long/large documents.
-          if (pdfDocument.loadingParams.disableAutoFetch || pagesCount > 7500) {
-            // XXX: Printing is semi-broken with auto fetch disabled.
-            this._pagesCapability.resolve();
-            return;
-          }
-          let getPagesLeft = pagesCount - 1; // The first page was already loaded.
+        //   // In addition to 'disableAutoFetch' being set, also attempt to reduce
+        //   // resource usage when loading *very* long/large documents.
+        //   if (pdfDocument.loadingParams.disableAutoFetch || pagesCount > 7500) {
+        //     // XXX: Printing is semi-broken with auto fetch disabled.
+        //     this._pagesCapability.resolve();
+        //     return;
+        //   }
+        //   let getPagesLeft = pagesCount - 1; // The first page was already loaded.
 
-          if (getPagesLeft <= 0) {
-            this._pagesCapability.resolve();
-            return;
-          }
-          for (let pageNum = 2; pageNum <= pagesCount; ++pageNum) {
-            pdfDocument.getPage(pageNum).then(
-              pdfPage => {
-                const pageView = this._pages[pageNum - 1];
-                if (!pageView.pdfPage) {
-                  pageView.setPdfPage(pdfPage);
-                }
-                this.linkService.cachePageRef(pageNum, pdfPage.ref);
-                if (--getPagesLeft === 0) {
-                  this._pagesCapability.resolve();
-                }
-              },
-              reason => {
-                console.error(`Unable to get page ${pageNum} to initialize viewer`, reason);
-                if (--getPagesLeft === 0) {
-                  this._pagesCapability.resolve();
-                }
-              }
-            );
-          }
-        });
+        //   if (getPagesLeft <= 0) {
+        //     this._pagesCapability.resolve();
+        //     return;
+        //   }
+        //   for (let pageNum = 2; pageNum <= pagesCount; ++pageNum) {
+        //     pdfDocument.getPage(pageNum).then(
+        //       pdfPage => {
+        //         const pageView = this._pages[pageNum - 1];
+        //         if (!pageView.pdfPage) {
+        //           pageView.setPdfPage(pdfPage);
+        //         }
+        //         this.linkService.cachePageRef(pageNum, pdfPage.ref);
+        //         if (--getPagesLeft === 0) {
+        //           this._pagesCapability.resolve();
+        //         }
+        //       },
+        //       reason => {
+        //         console.error(`Unable to get page ${pageNum} to initialize viewer`, reason);
+        //         if (--getPagesLeft === 0) {
+        //           this._pagesCapability.resolve();
+        //         }
+        //       }
+        //     );
+        //   }
+        // });
 
-        this.eventBus.dispatch("pagesinit", { source: this });
+        // this.eventBus.dispatch("pagesinit", { source: this });
 
-        if (this.defaultRenderingQueue) {
-          this.update();
-        }
+        // if (this.defaultRenderingQueue) {
+        //   this.update();
+        // }
       })
       .catch(reason => {
         console.error("Unable to initialize viewer", reason);
@@ -573,25 +579,26 @@ class BaseViewer {
   /**
    * @param {Array|null} labels
    */
-  setPageLabels(labels) {
-    if (!this.pdfDocument) {
-      return;
-    }
-    if (!labels) {
-      this._pageLabels = null;
-    } else if (!(Array.isArray(labels) && this.pdfDocument.numPages === labels.length)) {
-      this._pageLabels = null;
-      console.error(`${this._name}.setPageLabels: Invalid page labels.`);
-    } else {
-      this._pageLabels = labels;
-    }
-    // Update all the `PDFPageView` instances.
-    for (let i = 0, ii = this._pages.length; i < ii; i++) {
-      const pageView = this._pages[i];
-      const label = this._pageLabels && this._pageLabels[i];
-      pageView.setPageLabel(label);
-    }
-  }
+  // setPageLabels(labels) {
+  //   debugger
+  //   if (!this.pdfDocument) {
+  //     return;
+  //   }
+  //   if (!labels) {
+  //     this._pageLabels = null;
+  //   } else if (!(Array.isArray(labels) && this.pdfDocument.numPages === labels.length)) {
+  //     this._pageLabels = null;
+  //     console.error(`${this._name}.setPageLabels: Invalid page labels.`);
+  //   } else {
+  //     this._pageLabels = labels;
+  //   }
+  //   // Update all the `PDFPageView` instances.
+  //   for (let i = 0, ii = this._pages.length; i < ii; i++) {
+  //     const pageView = this._pages[i];
+  //     const label = this._pageLabels && this._pageLabels[i];
+  //     pageView.setPageLabel(label);
+  //   }
+  // }
 
   _resetView() {
     this._pages = [];
@@ -1072,6 +1079,7 @@ class BaseViewer {
     const scrollAhead = this._isScrollModeHorizontal ? this.scroll.right : this.scroll.down;
     const pageView = this.renderingQueue.getHighestPriority(visiblePages, this._pages, scrollAhead);
     if (pageView) {
+      // debugger
       this._ensurePdfPageLoaded(pageView).then(() => {
         this.renderingQueue.renderView(pageView);
       });
@@ -1234,8 +1242,8 @@ class BaseViewer {
   }
 
   _updateScrollMode(pageNumber = null) {
-    const scrollMode = this._scrollMode,
-      viewer = this.viewer;
+    const scrollMode = this._scrollMode;
+    var viewer = this.viewer;
 
     viewer.classList.toggle("scrollHorizontal", scrollMode === ScrollMode.HORIZONTAL);
     viewer.classList.toggle("scrollWrapped", scrollMode === ScrollMode.WRAPPED);

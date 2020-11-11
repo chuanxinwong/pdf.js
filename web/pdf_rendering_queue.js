@@ -38,24 +38,14 @@ class PDFRenderingQueue {
     this.isThumbnailViewEnabled = false;
   }
 
-  /**
-   * @param {PDFViewer} pdfViewer
-   */
   setViewer(pdfViewer) {
     this.pdfViewer = pdfViewer;
   }
 
-  /**
-   * @param {PDFThumbnailViewer} pdfThumbnailViewer
-   */
   setThumbnailViewer(pdfThumbnailViewer) {
     this.pdfThumbnailViewer = pdfThumbnailViewer;
   }
 
-  /**
-   * @param {IRenderableView} view
-   * @returns {boolean}
-   */
   isHighestPriority(view) {
     return this.highestPriorityPage === view.renderingId;
   }
